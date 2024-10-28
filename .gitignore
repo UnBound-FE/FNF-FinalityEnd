@@ -1,0 +1,12 @@
+art/
+assets/
+export/
+example_mods/FE2.0/
+dump/
+.DS_STORE
+.haxelib/
+.fordevs/
+.vs/
+.export_time
+Project.xmls
+project_test.cmd
