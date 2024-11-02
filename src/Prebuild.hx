@@ -1,4 +1,4 @@
-package tmp; // i know
+package src; // i know
 
 #if sys
 import sys.io.File;

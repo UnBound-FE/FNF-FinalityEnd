@@ -1,11 +1,11 @@
 [submodule "art"]
-    path = art
-    url = https://github.com/UnBound-FE/FNF-FinalityEnd-Art.git
+    path = art/
+    url = https://github.com/UnBound-FE/FNF-FinalityEnd-Art
 
 [submodule "assets"]
-    path = assets
-    url = https://github.com/UnBound-FE/FNF-FinalityEnd-Assets.git
+    path = assets/
+    url = https://github.com/UnBound-FE/FNF-FinalityEnd-Assets
 
 [submodule "example_mods/FE2.0"]
     path = example_mods/FE2.0
-    url = https://github.com/UnBound-FE/FNF-FinalityEnd-ModAsset.git
+    url = https://github.com/UnBound-FE/FNF-FinalityEnd-ModAsset

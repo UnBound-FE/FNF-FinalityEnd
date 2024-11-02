@@ -74,8 +74,6 @@ class TempoPreloader extends FlxBasePreloader
     super(Constants.PRELOADER_MIN_STAGE_TIME);
 
     print('Initializing...');
-    
-    tempo.utils.CLIUtil.resetWorkingDir();
 
     this.siteLockTitleText = Constants.SITE_LOCK_TITLE;
     this.siteLockBodyText = Constants.SITE_LOCK_DESC;
@@ -149,7 +147,7 @@ class TempoPreloader extends FlxBasePreloader
     }
 
     progressLeftText = new TextField();
-    progressLeftText.defaultTextFormat = new TextFormat(Paths.font('DS-DIGI.TTF'), 32, Constants.COLOR_PRELOADER_BAR, true);
+    progressLeftText.defaultTextFormat = new TextFormat(psych.backend.Paths.font('DS-DIGI.TTF'), 32, Constants.COLOR_PRELOADER_BAR, true);
     progressLeftText.defaultTextFormat.align = TextFormatAlign.LEFT;
     progressLeftText.selectable = false;
     progressLeftText.width = this._width - PreloaderConstants.PreloaderConstants.BAR_PADDING * 2;
@@ -161,7 +159,7 @@ class TempoPreloader extends FlxBasePreloader
 
     // Create the progress %.
     progressRightText = new TextField();
-    progressRightText.defaultTextFormat = new TextFormat(Paths.font('DS-DIGI.TTF'), 16, Constants.COLOR_PRELOADER_BAR, true);
+    progressRightText.defaultTextFormat = new TextFormat(psych.backend.Paths.font('DS-DIGI.TTF'), 16, Constants.COLOR_PRELOADER_BAR, true);
     progressRightText.defaultTextFormat.align = TextFormatAlign.RIGHT;
     progressRightText.selectable = false;
     progressRightText.width = this._width - PreloaderConstants.PreloaderConstants.BAR_PADDING * 2;
@@ -397,23 +395,23 @@ class TempoPreloader extends FlxBasePreloader
       else if (progressLeftText.text != text)
       {
         // We have to keep updating the text format, because the font can take a frame or two to load.
-        progressLeftText.defaultTextFormat = new TextFormat(Paths.font("DS-DIGI.TTF"), 32, Constants.COLOR_PRELOADER_BAR, true);
+        progressLeftText.defaultTextFormat = new TextFormat(psych.backend.Paths.font("DS-DIGI.TTF"), 32, Constants.COLOR_PRELOADER_BAR, true);
         progressLeftText.defaultTextFormat.align = TextFormatAlign.LEFT;
         progressLeftText.text = text;
 
-        dspText.defaultTextFormat = new TextFormat(Paths.font("Quantico-Regular.ttf"), 20, 0x000000, false);
+        dspText.defaultTextFormat = new TextFormat(psych.backend.Paths.font("Quantico-Regular.ttf"), 20, 0x000000, false);
         dspText.text = 'DSP'; // fukin dum....
         dspText.textColor = 0x000000;
 
-        tempoText.defaultTextFormat = new TextFormat(Paths.font("Quantico-Regular.ttf"), 20, 0x000000, false);
+        tempoText.defaultTextFormat = new TextFormat(psych.backend.Paths.font("Quantico-Regular.ttf"), 20, 0x000000, false);
         tempoText.text = 'TEMPO';
         tempoText.textColor = 0x000000;
 
-        enhancedText.defaultTextFormat = new TextFormat(Paths.font("Inconsolata-Bold.ttf"), 16, Constants.COLOR_PRELOADER_BAR, false);
+        enhancedText.defaultTextFormat = new TextFormat(psych.backend.Paths.font("Inconsolata-Bold.ttf"), 16, Constants.COLOR_PRELOADER_BAR, false);
         enhancedText.text = 'ENHANCED';
         enhancedText.textColor = Constants.COLOR_PRELOADER_BAR;
 
-        stereoText.defaultTextFormat = new TextFormat(Paths.font("Inconsolata-Bold.ttf"), 36, Constants.COLOR_PRELOADER_BAR, false);
+        stereoText.defaultTextFormat = new TextFormat(psych.backend.Paths.font("Inconsolata-Bold.ttf"), 36, Constants.COLOR_PRELOADER_BAR, false);
         stereoText.text = 'NATURAL STEREO';
       }
     }

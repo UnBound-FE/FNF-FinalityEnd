@@ -33,9 +33,9 @@
       "version": "2.5.0"
     },
     {
-      "name": "SScript",
+      "name": "hscript-iris",
       "type": "haxelib",
-      "version": "21.0.0"
+      "version": "1.1.0"
     },
     {
       "name": "linc_luajit",
@@ -98,6 +98,13 @@
       "dir": null,
       "ref": "d4a40ea6640084f1dfb9b61e3a24e1b3ef3a6423",
       "url": "https://github.com/MrzkTeam/tjson"
+    },
+    {
+      "name": "thx.core",
+      "type": "git",
+      "dir": "src",
+      "ref": "76d87418fadd92eb8e1b61f004cff27d656e53dd",
+      "url": "https://github.com/fponticelli/thx.core"
     }
   ]
 }

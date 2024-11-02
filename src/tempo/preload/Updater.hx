@@ -1,6 +1,6 @@
 package tempo.preload;
 
-import tempo.utils.Constants;
+import tempo.util.Constants;
 import openfl.events.MouseEvent;
 import tempo.preload.TempoPreloader as TP;
 
