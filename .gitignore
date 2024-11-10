@@ -1,6 +1,7 @@
 export/
 dump/
 example_mods/
+logs/
 .DS_STORE
 .haxelib/
 .fordevs/
