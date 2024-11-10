@@ -8,4 +8,5 @@ logs/
 .vs/
 .build.time
 Project.xmls
+modsList.txt
 project_test.cmd
