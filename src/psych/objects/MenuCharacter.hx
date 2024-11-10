@@ -3,88 +3,95 @@ package psych.objects;
 import openfl.utils.Assets;
 import haxe.Json;
 
-typedef MenuCharacterFile = {
-	var image:String;
-	var scale:Float;
-	var position:Array<Int>;
-	var idle_anim:String;
-	var confirm_anim:String;
-	var flipX:Bool;
+typedef MenuCharacterFile =
+{
+  var image:String;
+  var scale:Float;
+  var position:Array<Int>;
+  var idle_anim:String;
+  var confirm_anim:String;
+  var flipX:Bool;
 }
 
 class MenuCharacter extends FlxSprite
 {
-	public var character:String;
-	public var hasConfirmAnimation:Bool = false;
-	private static var DEFAULT_CHARACTER:String = 'bf';
+  public var character:String;
+  public var hasConfirmAnimation:Bool = false;
 
-	public function new(x:Float, character:String = 'bf')
-	{
-		super(x);
+  private static var DEFAULT_CHARACTER:String = 'bf';
 
-		antialiasing = ClientPrefs.data.antialiasing;
-		changeCharacter(character);
-	}
+  public function new(x:Float, character:String = 'bf')
+  {
+    super(x);
 
-	public function changeCharacter(?character:String = 'bf') {
-		if(character == null) character = '';
-		if(character == this.character) return;
+    antialiasing = ClientPrefs.data.antialiasing;
+    changeCharacter(character);
+  }
 
-		this.character = character;
-		visible = true;
+  public function changeCharacter(?character:String = 'bf')
+  {
+    if (character == null) character = '';
+    if (character == this.character) return;
 
-		var dontPlayAnim:Bool = false;
-		scale.set(1, 1);
-		updateHitbox();
+    this.character = character;
+    visible = true;
 
-		hasConfirmAnimation = false;
-		switch(character) {
-			case '':
-				visible = false;
-				dontPlayAnim = true;
-			default:
-				var characterPath:String = 'images/menucharacters/' + character + '.json';
-				var rawJson = null;
+    var dontPlayAnim:Bool = false;
+    scale.set(1, 1);
+    updateHitbox();
 
-				#if MODS_ALLOWED
-				var path:String = Paths.modFolders(characterPath);
-				if (!FileSystem.exists(path)) {
-					path = Paths.getSharedPath(characterPath);
-				}
+    hasConfirmAnimation = false;
+    switch (character)
+    {
+      case '':
+        visible = false;
+        dontPlayAnim = true;
+      default:
+        var characterPath:String = 'images/menucharacters/' + character + '.json';
+        var rawJson = null;
 
-				if(!FileSystem.exists(path)) {
-					path = Paths.getSharedPath('images/menucharacters/' + DEFAULT_CHARACTER + '.json');
-				}
-				rawJson = File.getContent(path);
+        #if MODS_ALLOWED
+        var path:String = Paths.modFolders(characterPath);
+        if (!FileSystem.exists(path))
+        {
+          path = Paths.getSharedPath(characterPath);
+        }
 
-				#else
-				var path:String = Paths.getSharedPath(characterPath);
-				if(!Assets.exists(path)) {
-					path = Paths.getSharedPath('images/menucharacters/' + DEFAULT_CHARACTER + '.json');
-				}
-				rawJson = Assets.getText(path);
-				#end
-				
-				var charFile:MenuCharacterFile = cast Json.parse(rawJson);
-				frames = Paths.getSparrowAtlas('menucharacters/' + charFile.image);
-				animation.addByPrefix('idle', charFile.idle_anim, 24);
+        if (!FileSystem.exists(path))
+        {
+          path = Paths.getSharedPath('images/menucharacters/' + DEFAULT_CHARACTER + '.json');
+        }
+        rawJson = File.getContent(path);
+        #else
+        var path:String = Paths.getSharedPath(characterPath);
+        if (!Assets.exists(path))
+        {
+          path = Paths.getSharedPath('images/menucharacters/' + DEFAULT_CHARACTER + '.json');
+        }
+        rawJson = Assets.getText(path);
+        #end
 
-				var confirmAnim:String = charFile.confirm_anim;
-				if(confirmAnim != null && confirmAnim.length > 0 && confirmAnim != charFile.idle_anim)
-				{
-					animation.addByPrefix('confirm', confirmAnim, 24, false);
-					if (animation.getByName('confirm') != null) //check for invalid animation
-						hasConfirmAnimation = true;
-				}
+        var charFile:MenuCharacterFile = tjson.TJSON.parse(rawJson);
+        frames = Paths.getSparrowAtlas('menucharacters/' + charFile.image);
+        animation.addByPrefix('idle', charFile.idle_anim, 24);
 
-				flipX = (charFile.flipX == true);
+        var confirmAnim:String = charFile.confirm_anim;
+        if (confirmAnim != null && confirmAnim.length > 0 && confirmAnim != charFile.idle_anim)
+        {
+          animation.addByPrefix('confirm', confirmAnim, 24, false);
+          if (animation.getByName('confirm') != null) // check for invalid animation
+            hasConfirmAnimation = true;
+        }
 
-				if(charFile.scale != 1) {
-					scale.set(charFile.scale, charFile.scale);
-					updateHitbox();
-				}
-				offset.set(charFile.position[0], charFile.position[1]);
-				animation.play('idle');
-		}
-	}
+        flipX = (charFile.flipX == true);
+
+        if (charFile.scale != 1)
+        {
+          scale.set(charFile.scale, charFile.scale);
+          updateHitbox();
+        }
+        offset.set(charFile.position[0], charFile.position[1]);
+        animation.play('idle');
+    }
+  }
 }

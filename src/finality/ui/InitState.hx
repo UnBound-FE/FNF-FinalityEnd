@@ -1,5 +1,7 @@
 package finality.ui;
 
+import finality.data.CursorPlugin;
+import psych.options.VisualsUISubState;
 import tempo.util.FileUtil;
 import tempo.util.plugins.ScreenshotPlugin;
 import tempo.util.log.CrashLog;
@@ -31,54 +33,53 @@ class InitState extends FlxState
 
     super.create();
 
-    if (_thread == null) // is very smoothy))
+    Controls.instance = new Controls();
+    ClientPrefs.loadDefaultKeys();
+
+    ClientPrefs.loadPrefs();
+    trace('saves loaded!');
+    Highscore.load();
+    trace('score saves loaded!');
+
+    // @:privateAccess new VisualsUISubState().onChangeCounters();
+
+    FlxG.fixedTimestep = false;
+    FlxG.game.focusLostFramerate = 60;
+    FlxG.keys.preventDefaultKeys = [TAB];
+
+    if (FlxG.save.data != null && FlxG.save.data.fullscreen) FlxG.fullscreen = FlxG.save.data.fullscreen;
+    if (FlxG.save.data.weekCompleted != null) StoryMenuState.weekCompleted = FlxG.save.data.weekCompleted;
+
+    FlxG.mouse.visible = false;
+    trace('FlxG stuff completed!');
+
+    CursorPlugin.init();
+
+    ScreenshotPlugin.initialize();
+
+    #if DISCORD_ALLOWED
+    DiscordClient.prepare();
+    #end
+
+    #if FREEPLAY
+    MusicBeatState.switchState(new FreeplayState());
+    trace('GO TO FREEPLAY!');
+    #elseif CHARTING
+    MusicBeatState.switchState(new ChartingState());
+    trace('GO TO CHART EDITOR!');
+    #else
+    if (FlxG.save.data.flashing == null && !psych.states.FlashingState.leftState)
     {
-      _thread = Thread.create(() -> {
-        Controls.instance = new Controls();
-        ClientPrefs.loadDefaultKeys();
-
-        ClientPrefs.loadPrefs();
-        trace('saves loaded!');
-        Highscore.load();
-        trace('score saves loaded!');
-
-        FlxG.fixedTimestep = false;
-        FlxG.game.focusLostFramerate = 60;
-        FlxG.keys.preventDefaultKeys = [TAB];
-
-        if (FlxG.save.data != null && FlxG.save.data.fullscreen) FlxG.fullscreen = FlxG.save.data.fullscreen;
-        if (FlxG.save.data.weekCompleted != null) StoryMenuState.weekCompleted = FlxG.save.data.weekCompleted;
-
-        FlxG.mouse.visible = false;
-        trace('FlxG stuff completed!');
-
-        ScreenshotPlugin.initialize();
-
-        #if DISCORD_ALLOWED
-        DiscordClient.prepare();
-        #end
-
-        #if FREEPLAY
-        MusicBeatState.switchState(new FreeplayState());
-        trace('GO TO FREEPLAY!');
-        #elseif CHARTING
-        MusicBeatState.switchState(new ChartingState());
-        trace('GO TO CHART EDITOR!');
-        #else
-        if (FlxG.save.data.flashing == null && !psych.states.FlashingState.leftState)
-        {
-          FlxTransitionableState.skipNextTransIn = true;
-          FlxTransitionableState.skipNextTransOut = true;
-          MusicBeatState.switchState(new psych.states.FlashingState());
-          trace('GO TO FLASHING LIGHT WARNING MENU!');
-        }
-        else
-        {
-          MusicBeatState.switchState(new TitleState());
-        }
-        #end
-      });
+      FlxTransitionableState.skipNextTransIn = true;
+      FlxTransitionableState.skipNextTransOut = true;
+      MusicBeatState.switchState(new psych.states.FlashingState());
+      trace('GO TO FLASHING LIGHT WARNING MENU!');
     }
+    else
+    {
+      MusicBeatState.switchState(new TitleState());
+    }
+    #end
   }
 
   override function update(elapsed:Float):Void

@@ -66,7 +66,7 @@ class RAM extends openfl.text.TextField
 
     if (currentCount != cacheCount)
     {
-      if (ClientPrefs.data.showRAM) text = "RAM: " + flixel.util.FlxStringUtil.formatBytes(currentRAM) + " / " + flixel.util.FlxStringUtil.formatBytes(peakRAM);
+      text = "RAM: " + flixel.util.FlxStringUtil.formatBytes(currentRAM) + " / " + flixel.util.FlxStringUtil.formatBytes(peakRAM);
 
       cacheCount = currentCount;
     }

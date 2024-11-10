@@ -1,5 +1,6 @@
 package finality.ui;
 
+import flixel.effects.FlxFlicker;
 import openfl.filters.ShaderFilter;
 import haxe.Json;
 import flixel.math.FlxMath;
@@ -75,11 +76,8 @@ class FreeplayState extends MusicBeatState
 
   override function create()
   {
-    FlxG.sound.music.loadEmbedded(Paths.music('themfreepl'), true);
-    FlxG.sound.music.volume = 0;
-    FlxG.sound.music.play();
-    // Paths.clearStoredMemory();
-    // Paths.clearUnusedMemory();
+    FlxG.sound.playMusic(Paths.music('themfreepl'), 0.0);
+
     charJson = tjson.TJSON.parse(Paths.getTextFromFile('data/freeplay.json', false));
 
     camGame = initPsychCamera();
@@ -89,6 +87,7 @@ class FreeplayState extends MusicBeatState
     FlxG.cameras.add(camStat, false);
 
     persistentUpdate = true;
+
     PlayState.isStoryMode = false;
     WeekData.reloadWeekFiles(false);
 
@@ -180,6 +179,7 @@ class FreeplayState extends MusicBeatState
     {
       var songText:Alphabet = new Alphabet(11500, 40, songs[i].songName, true);
       songText.targetY = i;
+      songText.zIndex = i;
       songText.alpha = 0;
       grpSongs.add(songText);
 
@@ -461,8 +461,6 @@ class FreeplayState extends MusicBeatState
       }*/
       trace(poop);
 
-      if (controls.ACCEPT) {}
-
       try
       {
         PlayState.SONG = Song.loadFromJson(poop, songLowercase);
@@ -491,13 +489,15 @@ class FreeplayState extends MusicBeatState
         super.update(elapsed);
         return;
       }
-      FlxG.camera.flash(FlxColor.BLACK, 2);
-      FlxTween.tween(FlxG.camera, {zoom: 1.4}, 1, {ease: FlxEase.quadOut});
-      FlxTween.tween(FlxG.camera, {angle: (FlxG.random.bool(50) ? 360 : -360)}, 2, {ease: FlxEase.cubeIn});
 
-      LoadingState.loadAndSwitchState(new PlayState());
+      FlxG.camera.flash(FlxColor.BLACK, 1.0);
+      FlxTween.tween(FlxG.camera, {zoom: 1.4}, 4, {ease: FlxEase.quadOut});
+      FlxTween.tween(FlxG.camera, {angle: (FlxG.random.bool(50) ? 360 : -360)}, 7, {ease: FlxEase.cubeIn});
+      FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
 
-      FlxG.sound.music.volume = 0;
+      new FlxTimer().start(1.0, (_) -> LoadingState.loadAndSwitchState(new PlayState()));
+
+      FlxG.sound.music.stop();
 
       destroyFreeplayVocals();
     }

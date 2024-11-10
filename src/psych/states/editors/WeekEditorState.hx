@@ -518,7 +518,7 @@ class WeekEditorState extends MusicBeatState
       var rawJson:String = File.getContent(fullPath);
       if (rawJson != null)
       {
-        loadedWeek = cast Json.parse(rawJson);
+        loadedWeek = tjson.TJSON.parse(rawJson);
         if (loadedWeek.weekCharacters != null && loadedWeek.weekName != null) // Make sure it's really a week
         {
           var cutName:String = _file.name.substr(0, _file.name.length - 5);

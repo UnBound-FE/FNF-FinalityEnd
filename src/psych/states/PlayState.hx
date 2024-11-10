@@ -168,9 +168,7 @@ class PlayState extends MusicBeatState
   public var health(default, set):Float = 1;
   public var combo:Int = 0;
 
-  public var healthBar:Bar;
-  public var newHB:NewBar;
-  public var timeBar:Bar;
+  public var healthBar:NewBar;
 
   var songPercent:Float = 0;
 
@@ -456,23 +454,6 @@ class PlayState extends MusicBeatState
     add(uiGroup);
 
     Conductor.songPosition = -5000 / Conductor.songPosition;
-    var showTime:Bool = (ClientPrefs.data.timeBarType != 'Disabled');
-    timeTxt = new FlxText(STRUM_X + (FlxG.width / 2) - 248, 19, 400, "", 32);
-    timeTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-    timeTxt.scrollFactor.set();
-    timeTxt.alpha = 0;
-    timeTxt.borderSize = 2;
-    timeTxt.visible = updateTime = showTime;
-    if (ClientPrefs.data.downScroll) timeTxt.y = FlxG.height - 44;
-    if (ClientPrefs.data.timeBarType == 'Song Name') timeTxt.text = SONG.song;
-
-    timeBar = new Bar(0, timeTxt.y + (timeTxt.height / 4), 'timeBar', function() return songPercent, 0, 1);
-    timeBar.scrollFactor.set();
-    timeBar.screenCenter(X);
-    timeBar.alpha = 0;
-    timeBar.visible = showTime;
-    uiGroup.add(timeBar);
-    uiGroup.add(timeTxt);
 
     strumLineNotes = new FlxTypedGroup<StrumNote>();
     noteGroup.add(strumLineNotes);
@@ -512,38 +493,41 @@ class PlayState extends MusicBeatState
     FlxG.worldBounds.set(0, 0, FlxG.width, FlxG.height);
     moveCameraSection();
 
-    healthBar = new Bar(0, FlxG.height * (!ClientPrefs.data.downScroll ? 0.89 : 0.11), 'healthBar', function() return health, 0, 2);
+    healthBar = new NewBar(FlxG.height * (!ClientPrefs.data.downScroll ? 0.795 : 0.0025), this, 'health');
     healthBar.screenCenter(X);
-    healthBar.leftToRight = false;
     healthBar.scrollFactor.set();
-    healthBar.visible = !ClientPrefs.data.hideHud;
-    healthBar.alpha = ClientPrefs.data.healthBarAlpha;
-    // uiGroup.add(healthBar);
-
-    newHB = new NewBar(FlxG.height * (!ClientPrefs.data.downScroll ? 0.675 : 0.0025), this, 'health');
-    newHB.screenCenter(X);
-    newHB.scrollFactor.set();
     reloadHealthBarColors();
-    uiGroup.add(newHB);
+    uiGroup.add(healthBar);
+
+    var showTime:Bool = (ClientPrefs.data.timeBarType != 'Disabled');
+    timeTxt = new FlxText(STRUM_X + (FlxG.width / 2) - 248, (healthBar.y + healthBar.height) - 50, 400, "", 32);
+    timeTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+    timeTxt.scrollFactor.set();
+    timeTxt.alpha = 0;
+    timeTxt.borderSize = 2;
+    timeTxt.visible = updateTime = showTime;
+    // if (ClientPrefs.data.downScroll) timeTxt.y = FlxG.height - 44;
+    if (ClientPrefs.data.timeBarType == 'Song Name') timeTxt.text = SONG.song;
+    // uiGroup.add(timeTxt);
 
     iconP1 = new HealthIcon(boyfriend.healthIcon, true);
-    iconP1.x = (newHB.width - iconP1.width);
-    iconP1.y = newHB.bg.y + 100;
+    iconP1.x = (healthBar.width - iconP1.width);
+    iconP1.y = healthBar.bg.y + 100;
     iconP1.visible = !ClientPrefs.data.hideHud;
     iconP1.alpha = ClientPrefs.data.healthBarAlpha;
     uiGroup.add(iconP1);
 
     iconP2 = new HealthIcon(dad.healthIcon, false);
-    iconP2.x = (newHB.x + iconP2.width);
-    iconP2.y = newHB.bg.y + 100;
+    iconP2.x = (healthBar.x + iconP2.width);
+    iconP2.y = healthBar.bg.y + 100;
     iconP2.visible = !ClientPrefs.data.hideHud;
     iconP2.alpha = ClientPrefs.data.healthBarAlpha;
     uiGroup.add(iconP2);
 
-    iconP1.x += 330;
-    iconP2.x -= 140;
+    iconP1.x += 350;
+    iconP2.x -= 160;
 
-    scoreTxt = new FlxText(0, newHB.y + 40, FlxG.width, "", 20);
+    scoreTxt = new FlxText(0, healthBar.y + 5, FlxG.width, "", 20);
     scoreTxt.setFormat(Paths.font("vcr.ttf"), 20, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
     scoreTxt.scrollFactor.set();
     scoreTxt.borderSize = 1.25;
@@ -551,13 +535,12 @@ class PlayState extends MusicBeatState
     updateScore(false);
     // uiGroup.add(scoreTxt);
 
-    botplayTxt = new FlxText(400, timeBar.y + 55, FlxG.width - 800, "BOTPLAY", 32);
+    botplayTxt = new FlxText(400, FlxG.height * (ClientPrefs.data.downScroll ? 0.15 : 0.85), FlxG.width - 800, "BOTPLAY", 32);
     botplayTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
     botplayTxt.scrollFactor.set();
     botplayTxt.borderSize = 1.25;
     botplayTxt.visible = cpuControlled;
     uiGroup.add(botplayTxt);
-    if (ClientPrefs.data.downScroll) botplayTxt.y = timeBar.y - 78;
 
     uiGroup.cameras = [camHUD];
     noteGroup.cameras = [camHUD];
@@ -698,8 +681,8 @@ class PlayState extends MusicBeatState
 
   public function reloadHealthBarColors()
   {
-    newHB.bar_1.color = FlxColor.fromRGB(boyfriend.healthColorArray[0], boyfriend.healthColorArray[1], boyfriend.healthColorArray[2]);
-    newHB.bar_2.color = FlxColor.fromRGB(dad.healthColorArray[0], dad.healthColorArray[1], dad.healthColorArray[2]);
+    healthBar.bar_1.color = FlxColor.fromRGB(boyfriend.healthColorArray[0], boyfriend.healthColorArray[1], boyfriend.healthColorArray[2]);
+    healthBar.bar_2.color = FlxColor.fromRGB(dad.healthColorArray[0], dad.healthColorArray[1], dad.healthColorArray[2]);
   }
 
   public function addCharacterToList(newCharacter:String, type:Int)
@@ -1130,7 +1113,7 @@ class PlayState extends MusicBeatState
       str += ' (${percent}%) - ${ratingFC}';
     }
 
-    var tempScore:String = 'Score: ${songScore}' + (!instakillOnMiss ? ' | Misses: ${songMisses}' : "") + ' | Rating: ${str}';
+    var tempScore:String = 'Score: ${songScore}' + (!instakillOnMiss ? ' • Misses: ${songMisses}' : "") + ' • Rating: ${str}';
     // "tempScore" variable is used to prevent another memory leak, just in case
     // "\n" here prevents the text from being cut off by beat zooms
     scoreTxt.text = '${tempScore}\n';
@@ -1238,7 +1221,6 @@ class PlayState extends MusicBeatState
 
     // Song duration in a float, useful for the time left feature
     songLength = FlxG.sound.music.length;
-    FlxTween.tween(timeBar, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
     FlxTween.tween(timeTxt, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
 
     #if DISCORD_ALLOWED
@@ -1321,7 +1303,75 @@ class PlayState extends MusicBeatState
           makeEvent(event, i);
     }
 
-    for (section in noteData)
+    generateNotesStrumTime(noteData);
+    for (event in songData.events) // Event Notes
+      for (i in 0...event[1].length)
+        makeEvent(event, i);
+
+    unspawnNotes.sort(sortByTime);
+    generatedMusic = true;
+  }
+
+  // called only once per different event (Used for precaching)
+  function eventPushed(event:EventNote)
+  {
+    eventPushedUnique(event);
+    if (eventsPushed.contains(event.event))
+    {
+      return;
+    }
+
+    stagesFunc(function(stage:BaseStage) stage.eventPushed(event));
+    eventsPushed.push(event.event);
+  }
+
+  // called by every event with the same name
+  function eventPushedUnique(event:EventNote)
+  {
+    switch (event.event)
+    {
+      case "Change Character":
+        var charType:Int = 0;
+        switch (event.value1.toLowerCase())
+        {
+          case 'gf' | 'girlfriend' | '1':
+            charType = 2;
+          case 'dad' | 'opponent' | '0':
+            charType = 1;
+          default:
+            var val1:Int = Std.parseInt(event.value1);
+            if (Math.isNaN(val1)) val1 = 0;
+            charType = val1;
+        }
+
+        var newCharacter:String = event.value2;
+        addCharacterToList(newCharacter, charType);
+
+      case 'Play Sound':
+        Paths.sound(event.value1); // Precache sound
+    }
+    stagesFunc(function(stage:BaseStage) stage.eventPushedUnique(event));
+  }
+
+  function eventEarlyTrigger(event:EventNote):Float
+  {
+    var returnedValue:Null<Float> = callOnScripts('eventEarlyTrigger', [event.event, event.value1, event.value2, event.strumTime], true, [], [0]);
+    if (returnedValue != null && returnedValue != 0 && returnedValue != LuaUtils.Function_Continue)
+    {
+      return returnedValue;
+    }
+
+    switch (event.event)
+    {
+      case 'Kill Henchmen': // Better timing so that the kill sound matches the beat intended
+        return 280; // Plays 280ms before the actual position
+    }
+    return 0;
+  }
+
+  function generateNotesStrumTime(data:Array<SwagSection>):Void
+  {
+    for (section in data)
     {
       for (songNotes in section.sectionNotes)
       {
@@ -1416,69 +1466,6 @@ class PlayState extends MusicBeatState
         }
       }
     }
-    for (event in songData.events) // Event Notes
-      for (i in 0...event[1].length)
-        makeEvent(event, i);
-
-    unspawnNotes.sort(sortByTime);
-    generatedMusic = true;
-  }
-
-  // called only once per different event (Used for precaching)
-  function eventPushed(event:EventNote)
-  {
-    eventPushedUnique(event);
-    if (eventsPushed.contains(event.event))
-    {
-      return;
-    }
-
-    stagesFunc(function(stage:BaseStage) stage.eventPushed(event));
-    eventsPushed.push(event.event);
-  }
-
-  // called by every event with the same name
-  function eventPushedUnique(event:EventNote)
-  {
-    switch (event.event)
-    {
-      case "Change Character":
-        var charType:Int = 0;
-        switch (event.value1.toLowerCase())
-        {
-          case 'gf' | 'girlfriend' | '1':
-            charType = 2;
-          case 'dad' | 'opponent' | '0':
-            charType = 1;
-          default:
-            var val1:Int = Std.parseInt(event.value1);
-            if (Math.isNaN(val1)) val1 = 0;
-            charType = val1;
-        }
-
-        var newCharacter:String = event.value2;
-        addCharacterToList(newCharacter, charType);
-
-      case 'Play Sound':
-        Paths.sound(event.value1); // Precache sound
-    }
-    stagesFunc(function(stage:BaseStage) stage.eventPushedUnique(event));
-  }
-
-  function eventEarlyTrigger(event:EventNote):Float
-  {
-    var returnedValue:Null<Float> = callOnScripts('eventEarlyTrigger', [event.event, event.value1, event.value2, event.strumTime], true, [], [0]);
-    if (returnedValue != null && returnedValue != 0 && returnedValue != LuaUtils.Function_Continue)
-    {
-      return returnedValue;
-    }
-
-    switch (event.event)
-    {
-      case 'Kill Henchmen': // Better timing so that the kill sound matches the beat intended
-        return 280; // Plays 280ms before the actual position
-    }
-    return 0;
   }
 
   public static function sortByTime(Obj1:Dynamic, Obj2:Dynamic):Int
@@ -1785,47 +1772,7 @@ class PlayState extends MusicBeatState
         else
           playerDance();
 
-        if (notes.length > 0)
-        {
-          if (startedCountdown)
-          {
-            var fakeCrochet:Float = (60 / SONG.bpm) * 1000;
-            notes.forEachAlive(function(daNote:Note) {
-              var strumGroup:FlxTypedGroup<StrumNote> = playerStrums;
-              if (!daNote.mustPress) strumGroup = opponentStrums;
-
-              var strum:StrumNote = strumGroup.members[daNote.noteData];
-              daNote.followStrumNote(strum, fakeCrochet, songSpeed / playbackRate);
-
-              if (daNote.mustPress)
-              {
-                if (cpuControlled
-                  && !daNote.blockHit
-                  && daNote.canBeHit
-                  && (daNote.isSustainNote || daNote.strumTime <= Conductor.songPosition)) goodNoteHit(daNote);
-              }
-              else if (daNote.wasGoodHit && !daNote.hitByOpponent && !daNote.ignoreNote) opponentNoteHit(daNote);
-
-              if (daNote.isSustainNote && strum.sustainReduce) daNote.clipToStrumNote(strum);
-
-              // Kill extremely late notes and cause misses
-              if (Conductor.songPosition - daNote.strumTime > noteKillOffset)
-              {
-                if (daNote.mustPress && !cpuControlled && !daNote.ignoreNote && !endingSong && (daNote.tooLate || !daNote.wasGoodHit)) noteMiss(daNote);
-
-                daNote.active = daNote.visible = false;
-                invalidateNote(daNote);
-              }
-            });
-          }
-          else
-          {
-            notes.forEachAlive(function(daNote:Note) {
-              daNote.canBeHit = false;
-              daNote.wasGoodHit = false;
-            });
-          }
-        }
+        updatingNoteActiving();
       }
       checkEventNote();
     }
@@ -1852,6 +1799,51 @@ class PlayState extends MusicBeatState
     callOnScripts('onUpdatePost', [elapsed]);
   }
 
+  private function updatingNoteActiving():Void
+  {
+    if (notes.length > 0)
+    {
+      if (startedCountdown)
+      {
+        var fakeCrochet:Float = (60 / SONG.bpm) * 1000;
+        notes.forEachAlive(function(daNote:Note) {
+          var strumGroup:FlxTypedGroup<StrumNote> = playerStrums;
+          if (!daNote.mustPress) strumGroup = opponentStrums;
+
+          var strum:StrumNote = strumGroup.members[daNote.noteData];
+          daNote.followStrumNote(strum, fakeCrochet, songSpeed / playbackRate);
+
+          if (daNote.mustPress)
+          {
+            if (cpuControlled
+              && !daNote.blockHit
+              && daNote.canBeHit
+              && (daNote.isSustainNote || daNote.strumTime <= Conductor.songPosition)) goodNoteHit(daNote);
+          }
+          else if (daNote.wasGoodHit && !daNote.hitByOpponent && !daNote.ignoreNote) opponentNoteHit(daNote);
+
+          if (daNote.isSustainNote && strum.sustainReduce) daNote.clipToStrumNote(strum);
+
+          // Kill extremely late notes and cause misses
+          if (Conductor.songPosition - daNote.strumTime > noteKillOffset)
+          {
+            if (daNote.mustPress && !cpuControlled && !daNote.ignoreNote && !endingSong && (daNote.tooLate || !daNote.wasGoodHit)) noteMiss(daNote);
+
+            daNote.active = daNote.visible = false;
+            invalidateNote(daNote);
+          }
+        });
+      }
+      else
+      {
+        notes.forEachAlive(function(daNote:Note) {
+          daNote.canBeHit = false;
+          daNote.wasGoodHit = false;
+        });
+      }
+    }
+  }
+
   // Health icon updaters
   public dynamic function updateIconsScale(elapsed:Float)
   {
@@ -1875,7 +1867,7 @@ class PlayState extends MusicBeatState
 
   function set_health(value:Float):Float // You can alter how icon animations work here
   {
-    if (!iconsAnimations || newHB == null)
+    if (!iconsAnimations || healthBar == null)
     {
       health = value;
       return health;
@@ -1884,8 +1876,8 @@ class PlayState extends MusicBeatState
     // update health bar
     health = value;
 
-    iconP1.animation.curAnim.curFrame = (newHB.bar_1.percent < 20) ? 1 : 0; // If health is under 20%, change player icon to frame 1 (losing icon), otherwise, frame 0 (normal)
-    iconP2.animation.curAnim.curFrame = (newHB.bar_1.percent > 80) ? 1 : 0; // If health is over 80%, change opponent icon to frame 1 (losing icon), otherwise, frame 0 (normal)
+    iconP1.animation.curAnim.curFrame = (healthBar.bar_1.percent < 20) ? 1 : 0; // If health is under 20%, change player icon to frame 1 (losing icon), otherwise, frame 0 (normal)
+    iconP2.animation.curAnim.curFrame = (healthBar.bar_1.percent > 80) ? 1 : 0; // If health is over 80%, change opponent icon to frame 1 (losing icon), otherwise, frame 0 (normal)
     return health;
   }
 
@@ -2402,7 +2394,6 @@ class PlayState extends MusicBeatState
       }
     }
 
-    timeBar.visible = false;
     timeTxt.visible = false;
     canPause = false;
     endingSong = true;
@@ -3157,6 +3148,10 @@ class PlayState extends MusicBeatState
     luaArray = [];
     FunkinLua.customFunctions.clear();
     #end
+
+    if (camGame.filters != null) camGame.filters = [];
+    if (camHUD.filters != null) camHUD.filters = [];
+    if (camOther.filters != null) camOther.filters = [];
 
     #if HSCRIPT_ALLOWED
     for (script in hscriptArray)

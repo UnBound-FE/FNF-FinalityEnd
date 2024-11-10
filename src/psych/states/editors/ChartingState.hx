@@ -285,6 +285,10 @@ class ChartingState extends MusicBeatState
     bpmTxt.scrollFactor.set();
     add(bpmTxt);
 
+    dummyArrow = new FlxSprite().makeGraphic(GRID_SIZE, GRID_SIZE);
+    dummyArrow.antialiasing = ClientPrefs.data.antialiasing;
+    add(dummyArrow);
+
     strumLine = new FlxSprite(0, 50).makeGraphic(Std.int(GRID_SIZE * 9), 4, FlxColor.RED);
     add(strumLine);
 
@@ -310,10 +314,6 @@ class ChartingState extends MusicBeatState
 
     camPos = new FlxObject(0, 0, 1, 1);
     camPos.setPosition(strumLine.x + CAM_OFFSET, strumLine.y);
-
-    dummyArrow = new FlxSprite().makeGraphic(GRID_SIZE, GRID_SIZE);
-    dummyArrow.antialiasing = ClientPrefs.data.antialiasing;
-    add(dummyArrow);
 
     var tabs = [
       {name: "Song", label: 'Song'},
@@ -1858,7 +1858,7 @@ class ChartingState extends MusicBeatState
       && FlxG.mouse.y < gridBG.y + (GRID_SIZE * getSectionBeats() * 4) * zoomList[curZoom])
     {
       dummyArrow.visible = true;
-      dummyArrow.x = Math.floor(FlxG.mouse.x / GRID_SIZE) * GRID_SIZE;
+      dummyArrow.x = (Math.floor(FlxG.mouse.x / GRID_SIZE) * GRID_SIZE) + 1;
       if (FlxG.keys.pressed.SHIFT) dummyArrow.y = FlxG.mouse.y;
       else
       {
@@ -2867,8 +2867,7 @@ class ChartingState extends MusicBeatState
     if (!OpenFlAssets.exists(path))
     #end
     {
-      path = Paths.getSharedPath('characters/' + Character.DEFAULT_CHARACTER +
-        '.json'); // If a character couldn't be found, change him to BF just to prevent a crash
+      path = Paths.getSharedPath('characters/' + Character.DEFAULT_CHARACTER + '.json');
       characterFailed = true;
     }
 
@@ -2877,7 +2876,7 @@ class ChartingState extends MusicBeatState
     #else
     var rawJson = OpenFlAssets.getText(path);
     #end
-    return cast Json.parse(rawJson);
+    return tjson.TJSON.parse(rawJson);
   }
 
   function updateNoteUI():Void

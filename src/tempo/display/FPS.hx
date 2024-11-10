@@ -68,16 +68,7 @@ class FPS extends openfl.text.TextField
 
     if (currentCount != cacheCount /*&& visible*/)
     {
-      if (ClientPrefs.data.showFPS)
-      {
-        text = "FPS: " + currentFPS;
-
-        #if (gl_stats && !disable_cffi && (!html5 || !canvas))
-        text += "\ntotalDC: " + Context3DStats.totalDrawCalls();
-        text += "\nstageDC: " + Context3DStats.contextDrawCalls(DrawCallContext.STAGE);
-        text += "\nstage3DDC: " + Context3DStats.contextDrawCalls(DrawCallContext.STAGE3D);
-        #end
-      }
+      text = "FPS: " + currentFPS;
     }
 
     cacheCount = currentCount;

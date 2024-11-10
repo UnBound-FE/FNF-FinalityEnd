@@ -123,6 +123,7 @@ class OptionsState extends MusicBeatState
     if (controls.BACK)
     {
       FlxG.sound.play(Paths.sound('cancelMenu'));
+
       if (onPlayState)
       {
         StageData.loadDirectory(PlayState.SONG);
@@ -131,9 +132,10 @@ class OptionsState extends MusicBeatState
       }
       else
         MusicBeatState.switchState(new MainMenuState());
+
       FlxG.camera.fade();
+
       FlxTween.tween(FlxG.camera, {zoom: 0.15}, 3, {ease: FlxEase.quadInOut});
-      MusicBeatState.switchState(new MainMenuState());
     }
     else if (controls.ACCEPT) openSelectedSubstate(options[curSelected]);
   }

@@ -1,5 +1,6 @@
 package psych.options;
 
+import psych.backend.PsychSetup;
 import psych.objects.Note;
 import psych.objects.StrumNote;
 import psych.objects.Alphabet;
@@ -84,9 +85,11 @@ class VisualsUISubState extends BaseOptionsMenu
 
     #if !mobile
     var option:Option = new Option('FPS Counter', 'If unchecked, hides FPS Counter.', 'showFPS', 'bool');
+    option.onChange = onChangeCounters;
     addOption(option);
 
     var option:Option = new Option('RAM Counter', "Uncheck this, for hide RAM counter", 'showRAM', 'bool');
+    option.onChange = onChangeCounters;
     addOption(option);
     #end
 
@@ -132,6 +135,14 @@ class VisualsUISubState extends BaseOptionsMenu
       else
         notesTween[i] = FlxTween.tween(note, {y: -200}, Math.abs(note.y / (200 + noteY)) / 3, {ease: FlxEase.quadInOut});
     }
+  }
+
+  function onChangeCounters()
+  {
+    for (fps in PsychSetup.fpsVars)
+      fps.visible = ClientPrefs.data.showFPS;
+    for (ram in PsychSetup.ramVars)
+      ram.visible = ClientPrefs.data.showRAM;
   }
 
   var changedMusic:Bool = false;

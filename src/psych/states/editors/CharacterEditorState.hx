@@ -447,7 +447,7 @@ class CharacterEditorState extends MusicBeatState
       _fileHandler.load(null, null, null, () -> {
         var data = _fileHandler.data;
 
-        character.loadCharacterFile(Json.parse(data));
+        character.loadCharacterFile(tjson.TJSON.parse(data));
         character.color = FlxColor.WHITE;
         character.alpha = 1;
         reloadAnimList();
