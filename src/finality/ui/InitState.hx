@@ -1,5 +1,6 @@
 package finality.ui;
 
+import tempo.util.FileUtil;
 import tempo.util.plugins.ScreenshotPlugin;
 import tempo.util.log.CrashLog;
 import psych.backend.Highscore;
@@ -22,6 +23,10 @@ class InitState extends FlxState
   {
     #if CRASH_HANDLER
     CrashLog.init();
+    #end
+
+    #if debug
+    FileUtil.createFolderIfNotExist('mods');
     #end
 
     super.create();

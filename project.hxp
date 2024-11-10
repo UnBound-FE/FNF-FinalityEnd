@@ -328,7 +328,6 @@ class Project extends HXProject
       addAssetLibrary("videos", false, willPreload);
       addAssetPath("assets/videos", "assets/videos", "videos", ['*'], exclude, false);
     }
-    if (MODS_ALLOWED.isEnabled(this)) addAssetPath('example_mods', 'mods', 'default', ['*'], exclude, false);
 
     addAsset("art/readme.txt", "do NOT readme.txt", "default", false);
     addAsset("LICENSE", "LICENSE.md", "default", false);
