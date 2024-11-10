@@ -6,6 +6,6 @@ logs/
 .haxelib/
 .fordevs/
 .vs/
-.export_time
+.build.time
 Project.xmls
 project_test.cmd
