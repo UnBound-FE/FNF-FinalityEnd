@@ -567,16 +567,16 @@ class PlayState extends MusicBeatState
 
     #if LUA_ALLOWED
     for (notetype in noteTypes)
-      startLuasNamed('custom_notetypes/' + notetype + '.lua');
+      startLuasNamed('notetypes/' + notetype + '.lua');
     for (event in eventsPushed)
-      startLuasNamed('custom_events/' + event + '.lua');
+      startLuasNamed('events/' + event + '.lua');
     #end
 
     #if HSCRIPT_ALLOWED
     for (notetype in noteTypes)
-      startHScriptsNamed('custom_notetypes/' + notetype + '.hx');
+      startHScriptsNamed('notetypes/' + notetype + '.hx');
     for (event in eventsPushed)
-      startHScriptsNamed('custom_events/' + event + '.hx');
+      startHScriptsNamed('events/' + event + '.hx');
     #end
     noteTypes = null;
     eventsPushed = null;
@@ -1219,8 +1219,7 @@ class PlayState extends MusicBeatState
   {
     startingSong = false;
 
-    @:privateAccess
-    FlxG.sound.playMusic(inst._sound, 1, false);
+    FlxG.sound.playMusic(Paths.inst(SONG.song));
     #if FLX_PITCH FlxG.sound.music.pitch = playbackRate; #end
     FlxG.sound.music.onComplete = finishSong.bind();
     vocals.play();
@@ -1299,13 +1298,7 @@ class PlayState extends MusicBeatState
     FlxG.sound.list.add(vocals);
     FlxG.sound.list.add(opponentVocals);
 
-    inst = new FlxSound();
-    try
-    {
-      inst.loadEmbedded(Paths.inst(songData.song));
-    }
-    catch (e:Dynamic) {}
-    FlxG.sound.list.add(inst);
+    FlxG.sound.music.loadEmbedded(Paths.inst(Paths.formatToSongPath(songData.song)));
 
     notes = new FlxTypedGroup<Note>();
     noteGroup.add(notes);

@@ -29,11 +29,13 @@ class Prompt extends MusicBeatSubstate
   var buttonNo:FlxButton;
   var cornerSize:Int = 10;
 
-  public function new(promptText:String = '', defaultSelected:Int = 0, okCallback:Void->Void, cancelCallback:Void->Void, acceptOnDefault:Bool = false,
+  public function new(promptText:String = '', defaultSelected:Int = 0, okCallback:Void->Void, ?cancelCallback:Void->Void, acceptOnDefault:Bool = false,
       option1:String = null, option2:String = null)
   {
     selected = defaultSelected;
     okc = okCallback;
+    if (cancelCallback == null) cancelCallback = () -> {};
+
     cancelc = cancelCallback;
     theText = promptText;
     goAnyway = acceptOnDefault;

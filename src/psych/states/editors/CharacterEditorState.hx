@@ -1,5 +1,7 @@
 package psych.states.editors;
 
+import haxe.Json;
+import tempo.data.TempoFileHandler;
 import flixel.FlxObject;
 import flixel.graphics.FlxGraphic;
 import flixel.animation.FlxAnimation;
@@ -54,6 +56,8 @@ class CharacterEditorState extends MusicBeatState
   var UI_box:FlxUITabMenu;
   var UI_characterbox:FlxUITabMenu;
 
+  var _fileHandler:TempoFileHandler;
+
   public function new(char:String = null, goToPlayState:Bool = true)
   {
     this._char = char;
@@ -101,7 +105,7 @@ class CharacterEditorState extends MusicBeatState
 
     addCharacter();
 
-    cameraFollowPointer = new FlxSprite(FlxGraphic.fromClass(PointerGraphic));
+    cameraFollowPointer = new FlxSprite().makeGraphic(1, 1, FlxColor.RED);
     cameraFollowPointer.setGraphicSize(40, 40);
     cameraFollowPointer.updateHitbox();
     add(cameraFollowPointer);
@@ -153,6 +157,8 @@ class CharacterEditorState extends MusicBeatState
     updatePointerPos();
     updateHealthBar();
     character.finishAnimation();
+
+    _fileHandler = new TempoFileHandler();
 
     if (ClientPrefs.data.cacheOnGPU) Paths.clearUnusedMemory();
 
@@ -397,7 +403,7 @@ class CharacterEditorState extends MusicBeatState
       updatePointerPos(false);
     };
 
-    var reloadCharacter:FlxButton = new FlxButton(140, 20, "Reload Char", function() {
+    var reloadCharacter:FlxButton = new FlxButton(140, 25, "Reload Char", function() {
       addCharacter(true);
       updatePointerPos();
       reloadCharacterOptions();
@@ -436,6 +442,23 @@ class CharacterEditorState extends MusicBeatState
       reloadCharacterDropDown();
       updateHealthBar();
     });
+
+    var loadChar:FlxButton = new FlxButton(140, 75, "Load File", () -> {
+      _fileHandler.load(null, null, null, () -> {
+        var data = _fileHandler.data;
+
+        character.loadCharacterFile(Json.parse(data));
+        character.color = FlxColor.WHITE;
+        character.alpha = 1;
+        reloadAnimList();
+        reloadCharacterOptions();
+        updateCharacterPositions();
+        updatePointerPos();
+        reloadCharacterDropDown();
+        updateHealthBar();
+      });
+    });
+
     templateCharacter.color = FlxColor.RED;
     templateCharacter.label.color = FlxColor.WHITE;
 
@@ -470,6 +493,7 @@ class CharacterEditorState extends MusicBeatState
     tab_group.add(new FlxText(charDropDown.x, charDropDown.y - 18, 0, 'Character:'));
     tab_group.add(check_player);
     tab_group.add(reloadCharacter);
+    tab_group.add(loadChar);
     tab_group.add(templateCharacter);
     tab_group.add(charDropDown);
     UI_box.addGroup(tab_group);

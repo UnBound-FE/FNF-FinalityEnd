@@ -1,8 +1,11 @@
 package psych.states.editors;
 
+import tempo.util.MathUtil;
 import tempo.util.DateUtil;
 import tempo.util.FileUtil;
+import tempo.data.TempoFileHandler;
 import haxe.Json;
+import haxe.format.JsonParser;
 import haxe.io.Bytes;
 import flixel.FlxObject;
 import flixel.addons.display.FlxGridOverlay;
@@ -17,6 +20,7 @@ import flixel.group.FlxGroup;
 import flixel.ui.FlxButton;
 import flixel.util.FlxSort;
 import lime.media.AudioBuffer;
+import lime.utils.Assets;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
 import openfl.media.Sound;
@@ -27,6 +31,7 @@ import psych.backend.Song;
 import psych.backend.StageData;
 import psych.objects.Note;
 import psych.objects.StrumNote;
+import psych.objects.NoteSplash;
 import psych.objects.HealthIcon;
 import psych.objects.AttachedSprite;
 import psych.objects.Character;
@@ -89,6 +94,7 @@ class ChartingState extends MusicBeatState
   ];
 
   var _file:FileReference;
+  var _fileHandler:TempoFileHandler;
 
   var UI_box:FlxUITabMenu;
 
@@ -176,6 +182,10 @@ class ChartingState extends MusicBeatState
 
   public var mouseQuant:Bool = false;
 
+  var endSection:Int = 0;
+
+  var autoSaveTimer:Null<FlxTimer> = null;
+
   override function create()
   {
     if (PlayState.SONG != null) _song = PlayState.SONG;
@@ -195,8 +205,6 @@ class ChartingState extends MusicBeatState
           speed: 1,
           stage: 'stage'
         };
-      addSection();
-      PlayState.SONG = _song;
     }
 
     // Paths.clearMemory();
@@ -259,13 +267,25 @@ class ChartingState extends MusicBeatState
     reloadGridLayer();
     Conductor.bpm = _song.bpm;
     Conductor.mapBPMChanges(_song);
+
+    if (PlayState.SONG == null)
+    {
+      endSection = Math.floor((FlxG.sound.music.length / 16) / 100);
+      trace(endSection);
+
+      for (i in 0...endSection)
+        addSection();
+
+      PlayState.SONG = _song;
+    }
+
     if (curSec >= _song.notes.length) curSec = _song.notes.length - 1;
 
     bpmTxt = new FlxText(1000, 50, 0, "", 16);
     bpmTxt.scrollFactor.set();
     add(bpmTxt);
 
-    strumLine = new FlxSprite(0, 50).makeGraphic(Std.int(GRID_SIZE * 9), 4);
+    strumLine = new FlxSprite(0, 50).makeGraphic(Std.int(GRID_SIZE * 9), 4, FlxColor.RED);
     add(strumLine);
 
     quant = new AttachedSprite('chart_quant', 'chart_quant');
@@ -365,7 +385,40 @@ class ChartingState extends MusicBeatState
     add(zoomTxt);
 
     updateGrid();
+
+    _fileHandler = new TempoFileHandler();
+
+    autoSaveT();
     super.create();
+  }
+
+  function autoSaveT():Void
+  {
+    lime.app.Application.current.onExit.add((_) -> {
+      autosaveSong();
+    });
+
+    if (autoSaveTimer != null) autoSaveTimer.cancel();
+
+    autoSaveTimer = new FlxTimer().start(120, (t:FlxTimer) -> {
+      persistentUpdate = false;
+      autosaveSong();
+      openSubState(new PopUpSubState('Wait 1-2 seconds\nCurrent chart autosaving...\n\n${randomBullshit()}', FlxG.random.float(1, 2)));
+    });
+  }
+
+  function randomBullshit():String
+  {
+    var v:String = '';
+
+    if (FlxG.random.bool(1)) v = "Suck chart... fuck";
+    else if (FlxG.random.bool(4)) v = "Please use Tempo Engine, if it exist in gamebanana!";
+    else if (FlxG.random.bool(25)) v = "Peace a peach of cake (idk what)";
+    else if (FlxG.random.bool(65)) v = "Madness... madness... MARIOS!!";
+    else if (FlxG.random.bool(72)) v = "Amogus";
+    else if (FlxG.random.bool(98)) v = "You charter? ok...";
+
+    return v;
   }
 
   var check_mute_inst:FlxUICheckBox = null;
@@ -386,7 +439,7 @@ class ChartingState extends MusicBeatState
     UI_songTitle = new FlxUIInputText(10, 10, 70, _song.song, 8);
     blockPressWhileTypingOn.push(UI_songTitle);
 
-    var check_voices = new FlxUICheckBox(10, 25, null, null, "Has voice track", 100);
+    var check_voices = new FlxUICheckBox(10, 30, null, null, "Has voice track", 100);
     check_voices.checked = _song.needsVoices;
     // _song.needsVoices = check_voices.checked;
     check_voices.callback = function() {
@@ -395,7 +448,14 @@ class ChartingState extends MusicBeatState
     };
 
     var saveButton:FlxButton = new FlxButton(110, 8, "Save", function() {
-      saveLevel();
+      var json =
+        {
+          "song": _song
+        };
+      var data:String = haxe.Json.stringify(json, "\t");
+
+      _fileHandler.save(Paths.formatToSongPath(_song.song) + ".json", data, () -> trace('completed!'), () -> trace('cancelled!'), () -> trace('errored!'));
+      // saveLevel();
     });
 
     var reloadSong:FlxButton = new FlxButton(saveButton.x + 90, saveButton.y, "Reload Audio", function() {
@@ -411,30 +471,80 @@ class ChartingState extends MusicBeatState
       }, null, ignoreWarnings));
     });
 
-    var loadAutosaveBtn:FlxButton = new FlxButton(reloadSongJson.x, reloadSongJson.y + 30, 'Load Autosave', function() {
+    var loadBtn:FlxButton = new FlxButton(110, reloadSongJson.y + 30, 'Load', function() {
+      _fileHandler.load(null, null, null, () -> {
+        var file = _fileHandler.data;
+        var data = Song.parseJSONshit(file);
 
-      PlayState.SONG = Song.parseJSONshit(FlxG.save.data.autosave);
-      MusicBeatState.resetState();
+        if (data.song == null)
+        {
+          trace('this chart not Psych!! returning...');
+          return;
+        }
+
+        PlayState.SONG = data;
+        MusicBeatState.resetState();
+      }, () -> {
+        trace('CANCELLED!');
+      }, () -> {
+        trace('ERROR!');
+      });
     });
 
-    var loadEventJson:FlxButton = new FlxButton(loadAutosaveBtn.x, loadAutosaveBtn.y + 30, 'Load Events', function() {
-      var songName:String = Paths.formatToSongPath(_song.song);
-      var file:String = Paths.json(songName + '/events');
-      #if sys
-      if (#if MODS_ALLOWED FileSystem.exists(Paths.modsJson(songName + '/events')) || #end FileSystem.exists(file))
-      #else
-      if (OpenFlAssets.exists(file))
-      #end
-      {
+    var loadEvBtn:FlxButton = new FlxButton(110, loadBtn.y + 30, 'Load Events', function() {
+      _fileHandler.load(null, null, null, () -> {
+        var file = _fileHandler.data;
         clearEvents();
-        var events:SwagSong = Song.loadFromJson('events', songName);
+        var events:SwagSong = Song.parseJSONshit(file);
+        if (events.events == null) events.events = [];
+
         _song.events = events.events;
         changeSection(curSec);
-      }
+      }, () -> {
+        trace('CANCELLED!');
+      }, () -> {
+        trace('ERROR!');
+      });
+    });
+
+    var loadAutosaveBtn:FlxButton = new FlxButton(reloadSongJson.x, reloadSongJson.y + 30, 'Load Autosave(P)', function() {
+      openSubState(new Prompt('This action will clear current progress.\n\nProceed?', 0, () -> {
+        PlayState.SONG = Song.parseJSONshit(FlxG.save.data.autosave);
+        MusicBeatState.resetState();
+      }));
+    });
+
+    var loadEventJson:FlxButton = new FlxButton(loadAutosaveBtn.x, loadAutosaveBtn.y + 30, 'Load Events(P)', function() {
+      openSubState(new Prompt('This action will clear current progress.\n\nProceed?', 0, () -> {
+        var songName:String = Paths.formatToSongPath(_song.song);
+        var file:String = Paths.json(songName + '/events');
+        #if sys
+        if (#if MODS_ALLOWED FileSystem.exists(Paths.modsJson(songName + '/events')) || #end FileSystem.exists(file))
+        #else
+        if (OpenFlAssets.exists(file))
+        #end
+        {
+          clearEvents();
+          var events:SwagSong = Song.loadFromJson('events', songName);
+          _song.events = events.events;
+          changeSection(curSec);
+        }
+      }));
     });
 
     var saveEvents:FlxButton = new FlxButton(110, reloadSongJson.y, 'Save Events', function() {
-      saveEvents();
+      if (_song.events != null && _song.events.length > 1) _song.events.sort(sortByTime);
+      var eventsSong:Dynamic =
+        {
+          events: _song.events
+        };
+      var json =
+        {
+          "song": eventsSong
+        }
+
+      var data:String = haxe.Json.stringify(json, "\t");
+      _fileHandler.save("events.json", data, () -> trace('completed!'), () -> trace('cancelled!'), () -> trace('errored!'));
     });
 
     var clear_events:FlxButton = new FlxButton(320, 310, 'Clear events', function() {
@@ -598,12 +708,14 @@ class ChartingState extends MusicBeatState
     tab_group_song.add(saveEvents);
     tab_group_song.add(reloadSong);
     tab_group_song.add(reloadSongJson);
+    tab_group_song.add(loadBtn);
     tab_group_song.add(loadAutosaveBtn);
+    tab_group_song.add(loadEvBtn);
     tab_group_song.add(loadEventJson);
     tab_group_song.add(stepperBPM);
     tab_group_song.add(stepperSpeed);
     tab_group_song.add(new FlxText(stepperBPM.x, stepperBPM.y - 15, 0, 'Song BPM:'));
-    tab_group_song.add(new FlxText(stepperBPM.x + 100, stepperBPM.y - 15, 0, 'Song Offset:'));
+    // tab_group_song.add(new FlxText(stepperBPM.x + 100, stepperBPM.y - 15, 0, 'Song Offset:'));
     tab_group_song.add(new FlxText(stepperSpeed.x, stepperSpeed.y - 15, 0, 'Song Speed:'));
     tab_group_song.add(new FlxText(player2DropDown.x, player2DropDown.y - 15, 0, 'Opponent:'));
     tab_group_song.add(new FlxText(gfVersionDropDown.x, gfVersionDropDown.y - 15, 0, 'Girlfriend:'));
@@ -914,7 +1026,7 @@ class ChartingState extends MusicBeatState
     }
 
     #if sys
-    var foldersToCheck:Array<String> = Mods.directoriesWithFile(Paths.getSharedPath(), 'custom_notetypes/');
+    var foldersToCheck:Array<String> = Mods.directoriesWithFile(Paths.getSharedPath(), 'notetypes/');
     for (folder in foldersToCheck)
       for (file in FileSystem.readDirectory(folder))
       {
@@ -973,11 +1085,13 @@ class ChartingState extends MusicBeatState
     var eventPushedMap:Map<String, Bool> = new Map<String, Bool>();
     var directories:Array<String> = [];
 
+    directories.push(Paths.getSharedPath('events/'));
+
     #if MODS_ALLOWED
-    directories.push(Paths.mods('custom_events/'));
-    directories.push(Paths.mods(Mods.currentModDirectory + '/custom_events/'));
+    directories.push(Paths.mods('events/'));
+    directories.push(Paths.mods(Mods.currentModDirectory + '/events/'));
     for (mod in Mods.getGlobalMods())
-      directories.push(Paths.mods(mod + '/custom_events/'));
+      directories.push(Paths.mods(mod + '/events/'));
     #end
 
     for (i in 0...directories.length)
@@ -1691,6 +1805,7 @@ class ChartingState extends MusicBeatState
 
   var lastConductorPos:Float;
   var colorSine:Float = 0;
+  var noteSelecting:Bool = false;
 
   override function update(elapsed:Float)
   {
@@ -1766,12 +1881,12 @@ class ChartingState extends MusicBeatState
             if (FlxG.keys.pressed.CONTROL)
             {
               selectNote(note);
+              // noteSelecting = true;
             }
             else if (FlxG.keys.pressed.ALT)
             {
               selectNote(note);
               curSelectedNote[3] = curNoteTypes[currentType];
-              updateGrid();
             }
             else
             {
@@ -1793,6 +1908,28 @@ class ChartingState extends MusicBeatState
         }
       }
     }
+
+    /* I tryied a selecting note, but idk what todo ;))))  ~mrzk
+      if (noteSelecting && FlxG.mouse.pressed)
+      {
+        if (FlxG.mouse.justMoved)
+        {
+          if (FlxG.mouse.x > gridBG.x
+            && FlxG.mouse.x < gridBG.x + gridBG.width
+            && FlxG.mouse.y > gridBG.y
+            && FlxG.mouse.y < gridBG.y + (GRID_SIZE * getSectionBeats() * 4) * zoomList[curZoom])
+            {
+              curRenderedNotes.forEachAlive((n:Note) -> {
+                n.x
+              });
+            }
+        }
+      }
+
+      if (noteSelecting && FlxG.mouse.justReleased)
+      {
+        noteSelecting = false;
+    }*/
 
     var blockInput:Bool = false;
     for (inputText in blockPressWhileTypingOn)
@@ -2181,15 +2318,17 @@ class ChartingState extends MusicBeatState
     bpmTxt.text = Std.string(FlxMath.roundDecimal(Conductor.songPosition / 1000, 2))
       + " / "
       + Std.string(FlxMath.roundDecimal(FlxG.sound.music.length / 1000, 2))
-      + "\nSection: "
+      + "\n\nSection: "
       + curSec
-      + "\n\nBeat: "
+      + "\nBeat: "
       + Std.string(curDecBeat).substring(0, 4)
-      + "\n\nStep: "
+      + "\nStep: "
       + curStep
       + "\n\nBeat Snap: "
       + quantization
-      + "th";
+      + "th"
+      + "\n\nTime: "
+      + Std.string(MathUtil.recalculateTime(FlxG.sound.music.time) + ' / ' + MathUtil.recalculateTime(FlxG.sound.music.length));
 
     var playedSound:Array<Bool> = [false, false, false, false]; // Prevents ouchy GF sex sounds
     curRenderedNotes.forEachAlive(function(note:Note) {
@@ -3236,8 +3375,14 @@ class ChartingState extends MusicBeatState
   {
     FileUtil.createFolderIfNotExist('backups');
 
-    var data = haxe.Json.stringify({"song": _song});
-    sys.io.File.saveContent('backups/chart-${DateUtil.generateTimestamp(Date.now())}', data);
+    var data = haxe.Json.stringify({"song": _song}, '\t');
+    sys.io.File.saveContent('backups/chart-${DateUtil.generateTimestamp(Date.now())}.json', data);
+
+    FlxG.save.data.autosave = haxe.Json.stringify(
+      {
+        "song": _song
+      });
+    FlxG.save.flush();
   }
 
   function clearEvents()
@@ -3266,13 +3411,13 @@ class ChartingState extends MusicBeatState
     var data:String = haxe.Json.stringify(json, "\t");
 
     if ((data != null) && (data.length > 0))
-		{
-			_file = new FileReference();
-			_file.addEventListener(#if desktop Event.SELECT #else Event.COMPLETE #end, onSaveComplete);
-			_file.addEventListener(Event.CANCEL, onSaveCancel);
-			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-			_file.save(data.trim(), Paths.formatToSongPath(_song.song) + ".json");
-		}
+    {
+      _file = new FileReference();
+      _file.addEventListener(#if desktop Event.SELECT #else Event.COMPLETE #end, onSaveComplete);
+      _file.addEventListener(Event.CANCEL, onSaveCancel);
+      _file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+      _file.save(data.trim(), Paths.formatToSongPath(_song.song) + ".json");
+    }
   }
 
   function sortByTime(Obj1:Array<Dynamic>, Obj2:Array<Dynamic>):Int

@@ -1,8 +1,6 @@
-art/
-assets/
 export/
-example_mods/FE2.0/
 dump/
+example_mods/
 .DS_STORE
 .haxelib/
 .fordevs/

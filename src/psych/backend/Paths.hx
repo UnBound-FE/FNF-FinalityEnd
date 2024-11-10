@@ -143,6 +143,9 @@ class Paths
     return 'assets/shared/$file';
   }
 
+  inline static public function getPreloadPath(file:String = '')
+    return 'assets/$file';
+
   inline static public function txt(key:String, ?library:String)
   {
     return getPath('data/$key.txt', TEXT, library);
@@ -214,6 +217,8 @@ class Paths
   inline static public function inst(song:String):Any
   {
     var songKey:String = '${formatToSongPath(song)}/Inst';
+    if (!FileSystem.exists(getPreloadPath('songs/' + songKey + '.ogg'))) songKey = '${formatToSongPath(song)}/inst';
+
     var inst = returnSound(null, songKey, 'songs');
     return inst;
   }

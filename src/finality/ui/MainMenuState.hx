@@ -341,6 +341,14 @@ class MainMenuState extends MusicBeatState
 
         if (controls.UI_UP_P) changeUpDown(-1);
         if (controls.UI_DOWN_P) changeUpDown(1);
+
+        #if debug
+        if (controls.justPressed('debug_1'))
+        {
+          selected = true;
+          MusicBeatState.switchState(new psych.states.editors.MasterEditorMenu());
+        }
+        #end
       }
     }
   }
