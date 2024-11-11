@@ -494,6 +494,7 @@ class PlayState extends MusicBeatState
     moveCameraSection();
 
     healthBar = new NewBar(FlxG.height * (!ClientPrefs.data.downScroll ? 0.795 : 0.0025), this, 'health');
+    healthBar.y = -85;
     healthBar.screenCenter(X);
     healthBar.scrollFactor.set();
     reloadHealthBarColors();
