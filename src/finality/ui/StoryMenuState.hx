@@ -25,12 +25,8 @@ class StoryMenuState extends MusicBeatState
   private static var lastDifficultyName:String = '';
 
   var backgrounds:FlxTypedGroup<FlxSprite>;
-  var icons:FlxTypedGroup<FlxSprite>;
 
   var bgShader:FlxRuntimeShader;
-
-  var selectorLeft:FlxSprite;
-  var selectorRight:FlxSprite;
 
   var lock:FlxSprite;
 
@@ -54,9 +50,6 @@ class StoryMenuState extends MusicBeatState
     bgShader.setFloat('vignetteMult', 1);
     backgrounds = new FlxTypedGroup<FlxSprite>();
     add(backgrounds);
-
-    icons = new FlxTypedGroup<FlxSprite>();
-    add(icons);
 
     #if DISCORD_ALLOWED
     // Updating Discord Rich Presence
@@ -85,32 +78,6 @@ class StoryMenuState extends MusicBeatState
     scoreText.scrollFactor.set();
     add(scoreText);
 
-    selectorLeft = new FlxSprite(FlxG.width / 2 - 340);
-    selectorLeft.frames = Paths.getSparrowAtlas('storymenu/selectors');
-    selectorLeft.scrollFactor.set();
-    selectorLeft.screenCenter(Y);
-    selectorLeft.animation.addByPrefix('idle', 'arrowLeft0', 24);
-    selectorLeft.animation.addByPrefix('press', 'arrowLeft-press', 24, false);
-    selectorLeft.animation.finishCallback = name -> selectorLeft.animation.play('idle');
-    selectorLeft.animation.callback = (name, frN, frI) -> selectorLeft.offset.set(name == 'idle' ? 0 : 80, 0);
-
-    selectorLeft.animation.play('idle');
-    selectorLeft.updateHitbox();
-    selectorLeft.x -= selectorLeft.width;
-    add(selectorLeft);
-
-    selectorRight = new FlxSprite(FlxG.width / 2 + 340);
-    selectorRight.frames = Paths.getSparrowAtlas('storymenu/selectors');
-    selectorRight.scrollFactor.set();
-    selectorRight.animation.addByPrefix('idle', 'arrowRight0', 24);
-    selectorRight.animation.addByPrefix('press', 'arrowRight-press', 24, false);
-    selectorRight.animation.play('idle');
-    selectorRight.animation.finishCallback = name -> selectorRight.animation.play('idle');
-    selectorRight.updateHitbox();
-    selectorRight.screenCenter(Y);
-
-    add(selectorRight);
-
     lock = new FlxSprite(0, 520).loadGraphic(Paths.image('storymenu/lock'));
     lock.screenCenter();
     lock.alpha = 0;
@@ -138,32 +105,6 @@ class StoryMenuState extends MusicBeatState
     var spr = new FlxSprite(itemID * FlxG.width).loadGraphic(Paths.image('storymenu/backgrounds/' + name));
     spr.ID = itemID;
     backgrounds.add(spr);
-
-    var icon = new FlxSprite(itemID * FlxG.width + FlxG.width / 2);
-    icon.frames = Paths.getSparrowAtlas('storymenu/week-icons/' + iconName);
-    icon.scrollFactor.set();
-    if (isLocked) icon.color = 0xFF444444;
-    switch (iconName)
-    {
-      case 'week1':
-        icon.offset.set(490, -50);
-        icon.animation.addByPrefix('idle', 'week1', 24);
-        icon.animation.play('idle');
-      case 'fire':
-        icon.offset.set(320, 0);
-        icon.animation.addByPrefix('idle', 'week20', 24);
-        icon.animation.callback = (name, frameNumber, frameIndex) -> if (name == 'select') icon.offset.set(330, 360);
-        icon.animation.addByPrefix('select', 'week2-accept', 24, false);
-        icon.animation.play('idle');
-      case 'pico\'s gun':
-        icon.offset.set(340, 0);
-        icon.animation.addByPrefix('idle', 'week3', 24);
-        icon.animation.play('idle');
-    }
-    icon.screenCenter(Y); // Y in source
-    icon.ID = itemID;
-
-    icons.add(icon);
 
     return spr;
   }
@@ -199,14 +140,12 @@ class StoryMenuState extends MusicBeatState
     {
       if (controls.UI_LEFT_P)
       {
-        selectorLeft.animation.play('press');
         FlxG.sound.play(Paths.sound('scrollMenu'));
         changeItem(-1);
       }
 
       if (controls.UI_RIGHT_P)
       {
-        selectorRight.animation.play('press');
         FlxG.sound.play(Paths.sound('scrollMenu'));
         changeItem(1);
       }
@@ -217,8 +156,6 @@ class StoryMenuState extends MusicBeatState
 
         FlxTween.tween(FlxG.camera, {alpha: 0, zoom: 5}, 0.8, {ease: FlxEase.quartInOut, startDelay: 0, onComplete: _ -> selectWeek()});
         FlxTween.num(1, 0, 0.8, {ease: FlxEase.quartInOut, startDelay: 0}, _ -> bgShader.setFloat('vignetteMult', _));
-
-        if (icons.members[curWeek].animation.exists('select')) icons.members[curWeek].animation.play('select');
       }
       if (controls.BACK)
       {
@@ -309,11 +246,6 @@ class StoryMenuState extends MusicBeatState
     backgrounds.forEach(spr -> {
       FlxTween.cancelTweensOf(spr);
       FlxTween.color(spr, 0.6, spr.color, spr.ID == curWeek ? 0xFFFFFFFF : 0xFF000000, {ease: FlxEase.sineInOut});
-    });
-
-    icons.forEach(spr -> {
-      FlxTween.cancelTweensOf(spr);
-      FlxTween.tween(spr, {x: FlxG.width * (-curWeek + spr.ID) + FlxG.width / 2}, 0.6, {ease: FlxEase.sineInOut});
     });
 
     if (weekIsLocked(loadedWeeks[curWeek].fileName))
