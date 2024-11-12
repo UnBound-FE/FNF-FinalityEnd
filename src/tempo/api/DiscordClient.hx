@@ -98,6 +98,11 @@ class DiscordClient
     button1.url = "https://imgb.ifunny.co/images/86c10a14f2cfe0858e01a2308c95c0caa20934a7844fffc22f71c13a31067a66_1.mp4";
     presence.buttons[0] = button1;
 
+    final button2:DiscordButton = DiscordButton.create();
+    button2.label = "Wiki";
+    button2.url = "https://media.discordapp.net/attachments/1232636528216379412/1300188501987430520/511_20241027220415.png?ex=67345da7&is=67330c27&hm=a51a0444e1be7768ab78d2f6eeaae2486f6391ab3c1ed1201d732f56b4d2cc0d&=&format=webp&quality=lossless&width=565&height=437";
+    presence.buttons[1] = button2;
+
     return presence;
   }
 
