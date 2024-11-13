@@ -62,6 +62,7 @@ class ChartingState extends MusicBeatState
       'Set GF Speed',
       "Sets GF head bopping speed,\nValue 1: 1 = Normal speed,\n2 = 1/2 speed, 4 = 1/4 speed etc.\nUsed on Fresh during the beatbox parts.\n\nWarning: Value must be integer!"
     ],
+    ['Add Camera Zoom', "camera change"],
     [
       'Play Animation',
       "Plays an animation on a Character,\nonce the animation is completed,\nthe animation changes to Idle\n\nValue 1: Animation to play.\nValue 2: Character (Dad, BF, GF)"
