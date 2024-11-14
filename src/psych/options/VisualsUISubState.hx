@@ -137,7 +137,7 @@ class VisualsUISubState extends BaseOptionsMenu
     }
   }
 
-  function onChangeCounters()
+  public static function onChangeCounters()
   {
     for (fps in PsychSetup.fpsVars)
       fps.visible = ClientPrefs.data.showFPS;

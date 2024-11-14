@@ -1,5 +1,7 @@
 package psych.states;
 
+import tempo.util.ColorUtil;
+import tempo.util.MathUtil;
 import psych.backend.Highscore;
 import psych.backend.StageData;
 import psych.backend.WeekData;
@@ -170,6 +172,7 @@ class PlayState extends MusicBeatState
 
   public var healthBar:NewBar;
 
+  var smoothHealth:Float = 1;
   var songPercent:Float = 0;
 
   public var ratingsData:Array<Rating> = Rating.loadDefault();
@@ -493,7 +496,7 @@ class PlayState extends MusicBeatState
     FlxG.worldBounds.set(0, 0, FlxG.width, FlxG.height);
     moveCameraSection();
 
-    healthBar = new NewBar(FlxG.height * (!ClientPrefs.data.downScroll ? 0.795 : 0.0025), this, 'health');
+    healthBar = new NewBar(FlxG.height * (!ClientPrefs.data.downScroll ? 0.795 : 0.0025), this, 'smoothHealth');
     healthBar.y = -85;
     healthBar.screenCenter(X);
     healthBar.scrollFactor.set();
@@ -1150,16 +1153,16 @@ class PlayState extends MusicBeatState
   {
     if (!ClientPrefs.data.scoreZoom) return;
 
-    if (scoreTxtTween != null) scoreTxtTween.cancel();
+    // if (scoreTxtTween != null) scoreTxtTween.cancel();
 
     scoreTxt.scale.x = 1.075;
     scoreTxt.scale.y = 1.075;
-    scoreTxtTween = FlxTween.tween(scoreTxt.scale, {x: 1, y: 1}, 0.2,
-      {
-        onComplete: function(twn:FlxTween) {
-          scoreTxtTween = null;
-        }
-      });
+    // scoreTxtTween = FlxTween.tween(scoreTxt.scale, {x: 1, y: 1}, 0.2,
+    //  {
+    //    onComplete: function(twn:FlxTween) {
+    //      scoreTxtTween = null;
+    //    }
+    //  });
   }
 
   public function setSongTime(time:Float)
@@ -1639,8 +1642,12 @@ class PlayState extends MusicBeatState
     opponentVocals.play();
   }
 
+  public static final DEFAULT_CAM_HUD_ZOOM:Float = 1;
+
   public var paused:Bool = false;
   public var canReset:Bool = true;
+  public var smoothGameZoom:Float = 1;
+  public var smoothHUDZoom:Float = 1;
 
   var startedCountdown:Bool = false;
   var canPause:Bool = true;
@@ -1695,10 +1702,12 @@ class PlayState extends MusicBeatState
       else if (controls.justPressed('debug_2')) openCharacterEditor();
     }
 
-    if (health > 2) health = 2;
+    if (health > Constants.HEALTH_MAX) health = Constants.HEALTH_MAX;
 
-    updateIconsScale(elapsed);
-    // updateIconsPosition();
+    if (scoreTxt != null) updateScoreTxtScale();
+
+    updateIconsScale();
+    updateSmoothHealth();
 
     if (startedCountdown && !paused) Conductor.songPosition += FlxG.elapsed * 1000 * playbackRate;
 
@@ -1721,10 +1730,13 @@ class PlayState extends MusicBeatState
       if (ClientPrefs.data.timeBarType != 'Song Name') timeTxt.text = FlxStringUtil.formatTime(secondsTotal, false);
     }
 
+    smoothGameZoom = MathUtil.coolLerp(FlxG.camera.zoom, defaultCamZoom, 0.1 * camZoomingDecay * playbackRate);
+    smoothHUDZoom = MathUtil.coolLerp(camHUD.zoom, DEFAULT_CAM_HUD_ZOOM, 0.1 * camZoomingDecay * playbackRate);
+
     if (camZooming)
     {
-      FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, Math.exp(-elapsed * 3.125 * camZoomingDecay * playbackRate));
-      camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, Math.exp(-elapsed * 3.125 * camZoomingDecay * playbackRate));
+      FlxG.camera.zoom = smoothGameZoom;
+      camHUD.zoom = smoothHUDZoom;
     }
 
     FlxG.watch.addQuick("secShit", curSection);
@@ -1846,15 +1858,28 @@ class PlayState extends MusicBeatState
   }
 
   // Health icon updaters
-  public dynamic function updateIconsScale(elapsed:Float)
+  public static final ICON_DEFAULT_SCALE:Float = .55;
+
+  public dynamic function updateIconsScale()
   {
-    var mult:Float = FlxMath.lerp(0.55, iconP1.scale.x, Math.exp(-elapsed * 9 * playbackRate));
-    iconP1.scale.set(mult, mult);
+    iconP1.scale.set(MathUtil.coolLerp(iconP1.scale.x, ICON_DEFAULT_SCALE, 0.2 * playbackRate),
+      MathUtil.coolLerp(iconP1.scale.y, ICON_DEFAULT_SCALE, 0.2 * playbackRate));
     iconP1.updateHitbox();
 
-    var mult:Float = FlxMath.lerp(0.55, iconP2.scale.x, Math.exp(-elapsed * 9 * playbackRate));
-    iconP2.scale.set(mult, mult);
+    iconP2.scale.set(MathUtil.coolLerp(iconP2.scale.x, ICON_DEFAULT_SCALE, 0.2 * playbackRate),
+      MathUtil.coolLerp(iconP2.scale.y, ICON_DEFAULT_SCALE, 0.2 * playbackRate));
     iconP2.updateHitbox();
+  }
+
+  public dynamic function updateScoreTxtScale():Void
+  {
+    scoreTxt.scale.set(MathUtil.coolLerp(scoreTxt.scale.x, 1, 0.15 * playbackRate), MathUtil.coolLerp(scoreTxt.scale.y, 1, 0.15 * playbackRate));
+    scoreTxt.updateHitbox();
+  }
+
+  public dynamic function updateSmoothHealth():Void
+  {
+    smoothHealth = MathUtil.coolLerp(smoothHealth, health, .2);
   }
 
   public dynamic function updateIconsPosition()
@@ -2522,6 +2547,8 @@ class PlayState extends MusicBeatState
       Paths.image(uiPrefix + 'num' + i + uiSuffix);
   }
 
+  public var curHealthBonus:Float = 0;
+
   private function popUpScore(note:Note = null):Void
   {
     var noteDiff:Float = Math.abs(note.strumTime - Conductor.songPosition + ClientPrefs.data.ratingOffset);
@@ -2548,6 +2575,11 @@ class PlayState extends MusicBeatState
     if (!note.ratingDisabled) daRating.hits++;
     note.rating = daRating.name;
     score = daRating.score;
+
+    curHealthBonus = (daRating.health * (ClientPrefs.data.ghostTapping ? FlxG.random.float(0.75, 0.925) : 1));
+    health += (daRating.health * (ClientPrefs.data.ghostTapping ? FlxG.random.float(0.75, 0.925) : 1)) * healthGain;
+
+    if (daRating.name == 'shit' || daRating.name == 'bad') createGhostNote(note);
 
     if (daRating.noteSplash && !note.noteSplashData.disabled) spawnNoteSplashOnNote(note);
 
@@ -2674,8 +2706,22 @@ class PlayState extends MusicBeatState
       });
   }
 
+  public function createGhostNote(note:Note = null):Void
+  {
+    var ghoster:Note = new Note(note.strumTime, note.noteData, null, note.isSustainNote);
+    ghoster.multAlpha = note.multAlpha * .5;
+    ghoster.mustPress = note.mustPress;
+    ghoster.ignoreNote = true;
+    ghoster.blockHit = true;
+    ghoster.rgbShader.r = ColorUtil.int_desat(ghoster.rgbShader.r, .5);
+    ghoster.rgbShader.g = ColorUtil.int_desat(ghoster.rgbShader.g, .5);
+    ghoster.rgbShader.b = ColorUtil.int_desat(ghoster.rgbShader.b, .5);
+    notes.add(ghoster);
+  }
+
   public var strumsBlocked:Array<Bool> = [];
 
+  @:access(flixel.input.keyboard.FlxKeyboard)
   private function onKeyPress(event:KeyboardEvent):Void
   {
     var eventKey:FlxKey = event.keyCode;
@@ -2685,7 +2731,7 @@ class PlayState extends MusicBeatState
     {
       #if debug
       // Prevents crash specifically on debug without needing to try catch shit
-      @:privateAccess if (!FlxG.keys._keyListMap.exists(eventKey)) return;
+      if (!FlxG.keys._keyListMap.exists(eventKey)) return;
       #end
 
       if (FlxG.keys.checkStatus(eventKey, JUST_PRESSED)) keyPressed(key);
@@ -2713,22 +2759,15 @@ class PlayState extends MusicBeatState
     var shouldMiss:Bool = !ClientPrefs.data.ghostTapping;
 
     if (plrInputNotes.length != 0)
-    { // slightly faster than doing `> 0` lol
+    {
       var funnyNote:Note = plrInputNotes[0]; // front note
-
       if (plrInputNotes.length > 1)
       {
         var doubleNote:Note = plrInputNotes[1];
-
         if (doubleNote.noteData == funnyNote.noteData)
         {
-          // if the note has a 0ms distance (is on top of the current note), kill it
           if (Math.abs(doubleNote.strumTime - funnyNote.strumTime) < 1.0) invalidateNote(doubleNote);
-          else if (doubleNote.strumTime < funnyNote.strumTime)
-          {
-            // replace the note if its ahead of time (or at least ensure "doubleNote" is ahead)
-            funnyNote = doubleNote;
-          }
+          else if (doubleNote.strumTime < funnyNote.strumTime) funnyNote = doubleNote;
         }
       }
       goodNoteHit(funnyNote);
@@ -2804,22 +2843,32 @@ class PlayState extends MusicBeatState
   private function keysCheck():Void
   {
     // HOLDING
-    var holdArray:Array<Bool> = [];
-    var pressArray:Array<Bool> = [];
-    var releaseArray:Array<Bool> = [];
-    for (key in keysArray)
+    var keyMap:Map<String, Array<Bool>> = ['hold' => [], 'press' => [], 'release' => []];
+
+    for (n => k in keyMap)
     {
-      holdArray.push(controls.pressed(key));
-      if (controls.controllerMode)
+      final isHold:Bool = (n == 'hold');
+      final isPress:Bool = (n == 'press');
+      final isRelease:Bool = (n == 'release');
+
+      for (key in keysArray)
       {
-        pressArray.push(controls.justPressed(key));
-        releaseArray.push(controls.justReleased(key));
+        if (isHold) k.push(controls.pressed(key));
+
+        if (controls.controllerMode)
+        {
+          if (isPress) k.push(controls.justPressed(key));
+          if (isRelease) k.push(controls.justReleased(key));
+        }
       }
     }
 
     // TO DO: Find a better way to handle controller inputs, this should work for now
-    if (controls.controllerMode && pressArray.contains(true)) for (i in 0...pressArray.length)
-      if (pressArray[i] && strumsBlocked[i] != true) keyPressed(i);
+    if (controls.controllerMode && keyMap.get('press').contains(true))
+    {
+      for (i in 0...keyMap.get('press').length)
+        if (keyMap.get('press')[i] && strumsBlocked[i] != true) keyPressed(i);
+    }
 
     if (startedCountdown && !inCutscene && !boyfriend.stunned && generatedMusic)
     {
@@ -2833,19 +2882,19 @@ class PlayState extends MusicBeatState
 
           if (canHit && n.isSustainNote)
           {
-            var released:Bool = !holdArray[n.noteData];
-
+            var released:Bool = !keyMap.get('hold')[n.noteData];
             if (!released) goodNoteHit(n);
           }
         }
       }
 
-      if (!holdArray.contains(true) || endingSong) playerDance();
+      if (!keyMap.get('hold').contains(true) || endingSong) playerDance();
     }
 
     // TO DO: Find a better way to handle controller inputs, this should work for now
-    if ((controls.controllerMode || strumsBlocked.contains(true)) && releaseArray.contains(true)) for (i in 0...releaseArray.length)
-      if (releaseArray[i] || strumsBlocked[i] == true) keyReleased(i);
+    if ((controls.controllerMode || strumsBlocked.contains(true))
+      && keyMap.get('release').contains(true)) for (i in 0...keyMap.get('release').length)
+        if (keyMap.get('release')[i] || strumsBlocked[i] == true) keyReleased(i);
   }
 
   function noteMiss(daNote:Note):Void
@@ -2875,12 +2924,12 @@ class PlayState extends MusicBeatState
   {
     if (ClientPrefs.data.ghostTapping) return; // fuck it
 
-    noteMissCommon(direction);
+    noteMissCommon(direction, null, true);
     FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
     callOnScripts('noteMissPress', [direction]);
   }
 
-  function noteMissCommon(direction:Int, note:Note = null)
+  function noteMissCommon(direction:Int, note:Note = null, isPressed:Bool = false)
   {
     // score and data
     var subtract:Float = 0.05;
@@ -2891,7 +2940,7 @@ class PlayState extends MusicBeatState
     {
       if (note.tail.length > 0)
       {
-        note.alpha = 0.35;
+        note.visible = false; // yes
         for (childNote in note.tail)
         {
           childNote.alpha = note.alpha;
@@ -2937,9 +2986,9 @@ class PlayState extends MusicBeatState
     }
 
     var lastCombo:Int = combo;
-    combo = 0;
+    if (!isPressed) combo = 0;
 
-    health -= subtract * healthLoss;
+    health -= (subtract * healthLoss) * (ClientPrefs.data.ghostTapping ? FlxG.random.float(1.15, 1.6) : 1);
     if (!practiceMode) songScore -= 10;
     if (!endingSong) songMisses++;
     totalPlayed++;
@@ -3095,6 +3144,7 @@ class PlayState extends MusicBeatState
     }
     else
       strumPlayAnim(false, Std.int(Math.abs(note.noteData)), Conductor.stepCrochet * 1.25 / 1000 / playbackRate);
+
     vocals.volume = 1;
 
     if (!note.isSustainNote)
@@ -3105,7 +3155,9 @@ class PlayState extends MusicBeatState
     }
     var gainHealth:Bool = true; // prevent health gain, *if* sustains are treated as a singular note
     if (guitarHeroSustains && note.isSustainNote) gainHealth = false;
-    if (gainHealth) health += note.hitHealth * healthGain;
+    if (gainHealth && note.isSustainNote && note.rating != 'shit')
+      health += ((curHealthBonus * Constants.HEALTH_HOLD_BONUS_PER_SECOND) * healthGain) * (ClientPrefs.data.ghostTapping ? FlxG.random.float(0.7, 0.95) : 1);
+    if (note.rating == 'shit') combo = 0;
 
     var result:Dynamic = callOnLuas('goodNoteHit', [notes.members.indexOf(note), leData, leType, isSus]);
     if (result != LuaUtils.Function_Stop

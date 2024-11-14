@@ -41,8 +41,6 @@ class InitState extends FlxState
     Highscore.load();
     trace('score saves loaded!');
 
-    // @:privateAccess new VisualsUISubState().onChangeCounters();
-
     FlxG.fixedTimestep = false;
     FlxG.game.focusLostFramerate = 60;
     FlxG.keys.preventDefaultKeys = [TAB];
@@ -52,6 +50,8 @@ class InitState extends FlxState
 
     FlxG.mouse.visible = false;
     trace('FlxG stuff completed!');
+
+    VisualsUISubState.onChangeCounters();
 
     CursorPlugin.init();
 
