@@ -430,7 +430,7 @@ class Constants
    * The amount of health the player gains when hitting a note with the SHIT rating.
    * If negative, the player will actually lose health.
    */
-  public static final HEALTH_SHIT_BONUS:Float = -1.0 / 100.0 * HEALTH_MAX; // -1.0%
+  public static final HEALTH_SHIT_BONUS:Float = -5 / 100.0 * HEALTH_MAX; // -1.0%
 
   /**
    * The amount of health the player gains, while holding a hold note, per second.

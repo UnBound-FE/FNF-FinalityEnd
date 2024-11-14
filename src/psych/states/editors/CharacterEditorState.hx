@@ -1,5 +1,6 @@
 package psych.states.editors;
 
+import flixel.addons.display.FlxGridOverlay;
 import haxe.Json;
 import tempo.data.TempoFileHandler;
 import flixel.FlxObject;
@@ -79,6 +80,12 @@ class CharacterEditorState extends MusicBeatState
     FlxG.cameras.add(camHUD, false);
 
     loadBG();
+
+    var bg:FlxSprite = FlxGridOverlay.create(80, 80, FlxG.width * 12, FlxG.height * 12, true, FlxColor.fromString('0xE4E4E4'), FlxColor.fromString('0xC4C4C4'));
+    bg.scrollFactor.set();
+    bg.screenCenter();
+    bg.updateHitbox();
+    add(bg);
 
     animsTxtGroup = new FlxTypedGroup<FlxText>();
     silhouettes = new FlxSpriteGroup();
@@ -450,6 +457,8 @@ class CharacterEditorState extends MusicBeatState
         character.loadCharacterFile(tjson.TJSON.parse(data));
         character.color = FlxColor.WHITE;
         character.alpha = 1;
+        _char = character.curCharacter;
+        charDropDown.selectedLabel = character.curCharacter;
         reloadAnimList();
         reloadCharacterOptions();
         updateCharacterPositions();
@@ -695,7 +704,26 @@ class CharacterEditorState extends MusicBeatState
     positionCameraYStepper = new FlxUINumericStepper(positionYStepper.x, positionYStepper.y + 40, 10, character.cameraPosition[1], -9000, 9000, 0);
 
     var saveCharacterButton:FlxButton = new FlxButton(reloadImage.x, noAntialiasingCheckBox.y + 40, "Save Character", function() {
-      saveCharacter();
+      var json:Dynamic =
+        {
+          "animations": character.animationsArray,
+          "image": character.imageFile,
+          "scale": character.jsonScale,
+          "sing_duration": character.singDuration,
+          "healthicon": character.healthIcon,
+
+          "position": character.positionArray,
+          "camera_position": character.cameraPosition,
+
+          "flip_x": character.originalFlipX,
+          "no_antialiasing": character.noAntialiasing,
+          "healthbar_colors": character.healthColorArray,
+          "vocals_file": character.vocalsFile,
+          "_editor_isPlayer": character.isPlayer
+        };
+
+      var data:String = haxe.Json.stringify(json, "\t");
+      _fileHandler.save(_char + '.json', data, () -> trace('completed!'), () -> trace('cancelled'), () -> trace('errored!'));
     });
 
     healthColorStepperR = new FlxUINumericStepper(singDurationStepper.x, saveCharacterButton.y, 20, character.healthColorArray[0], 0, 255, 0);
