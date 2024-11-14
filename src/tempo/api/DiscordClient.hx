@@ -8,6 +8,8 @@ import sys.thread.Thread;
 import Sys.println as print;
 import Sys.sleep;
 
+// BURP ENGINEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+// TODO: EBAT VURADO ZA BURPPPPPPPPPPPPPPPPPPP
 class DiscordClient
 {
   private inline static final DEFAULT_ID:String = "1270730583278096475";

@@ -92,7 +92,7 @@ class Project extends HXProject
 
   function flair()
   {
-    info("Finality End: DELUXE (Based on Psych and Tempo Engine)");
+    info("Finality End: DELUXE (Based on Psych and Burp Engine)");
     info("Initializing build...");
 
     info("Version:      " + METADATA.get('version'));
