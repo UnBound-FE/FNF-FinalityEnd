@@ -95,18 +95,13 @@ class DiscordClient
 
     final button1:DiscordButton = DiscordButton.create();
     button1.label = "Game Page";
-    button1.url = "https://discord.gg/HvgydnkC8C";
+    button1.url = "https://gamebanana.com/mods/538437";
     presence.buttons[0] = button1;
 
     final button2:DiscordButton = DiscordButton.create();
     button2.label = "Discord server";
-    button2.url = "https://discord.gg/72mmzBAc9B";
+    button2.url = "https://discord.gg/HvgydnkC8C";
     presence.buttons[1] = button2;
-
-    final button3:DiscordButton = DiscordButton.create();
-    button3.label = "Top Secret";
-    button3.url = "https://discord.gg/72mmzBAc9B";
-    presence.buttons[2] = button3;
 
     return presence;
   }
