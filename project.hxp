@@ -92,7 +92,7 @@ class Project extends HXProject
 
   function flair()
   {
-    info("Finality End: DELUXE (Based on Psych and Burp Engine)");
+    info("Finality End: DELUXE (Based on Psych and Tempo Engine)");
     info("Initializing build...");
 
     info("Version:      " + METADATA.get('version'));
@@ -328,6 +328,9 @@ class Project extends HXProject
       addAssetLibrary("videos", false, willPreload);
       addAssetPath("assets/videos", "assets/videos", "videos", ['*'], exclude, false);
     }
+
+    if (getTarget(Platform.WINDOWS))
+      addAssetPath('crash-dialog', '', "default", ['*'],  exclude, false);
 
     addAsset("art/readme.txt", "do NOT readme.txt", "default", false);
     addAsset("LICENSE", "LICENSE.md", "default", false);

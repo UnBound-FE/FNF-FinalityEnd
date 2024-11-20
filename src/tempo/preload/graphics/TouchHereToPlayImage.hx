@@ -1,4 +1,4 @@
-package tempo.preload.images;
+package tempo.preload.graphics;
 
 #if TOUCH_HERE_TO_PLAY
 @:bitmap('art/touchHereToPlay.png')

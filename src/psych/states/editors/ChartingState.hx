@@ -399,12 +399,20 @@ class ChartingState extends MusicBeatState
       autosaveSong();
     });
 
+    timerAuto();
+  }
+
+  function timerAuto():Void
+  {
     if (autoSaveTimer != null) autoSaveTimer.cancel();
 
     autoSaveTimer = new FlxTimer().start(120, (t:FlxTimer) -> {
       persistentUpdate = false;
       autosaveSong();
-      openSubState(new PopUpSubState('Wait 1-2 seconds\nCurrent chart autosaving...\n\n${randomBullshit()}', FlxG.random.float(1, 2)));
+      openSubState(new PopUpSubState('Current chart autosaving...\n\n${randomBullshit()}', FlxG.random.float(0.4)));
+
+      t = null;
+      timerAuto();
     });
   }
 
@@ -412,12 +420,12 @@ class ChartingState extends MusicBeatState
   {
     var v:String = '';
 
-    if (FlxG.random.bool(1)) v = "Suck chart... fuck";
-    else if (FlxG.random.bool(4)) v = "Please use Tempo Engine, if it exist in gamebanana!";
+    if (FlxG.random.bool(1)) v = "$Suck$ chart... #fuck#";
+    else if (FlxG.random.bool(4)) v = "Please use $Tempo Engine$, if it uploaded in gamebanana!";
     else if (FlxG.random.bool(25)) v = "Peace a peach of cake (idk what)";
-    else if (FlxG.random.bool(65)) v = "Madness... madness... MARIOS!!";
+    else if (FlxG.random.bool(65)) v = "Madness... madness... #MARIOS#!!";
     else if (FlxG.random.bool(72)) v = "Amogus";
-    else if (FlxG.random.bool(98)) v = "You charter? ok...";
+    else if (FlxG.random.bool(98)) v = "You $charter$? #ok#...";
 
     return v;
   }

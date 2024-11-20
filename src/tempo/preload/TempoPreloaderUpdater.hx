@@ -5,7 +5,7 @@ import openfl.events.MouseEvent;
 import tempo.preload.TempoPreloader as TP;
 
 @:access(tempo.preload.TempoPreloader)
-class Updater
+class TempoPreloaderUpdater
 {
   public static function updateState(percent:Float, elapsed:Float):Float
   {

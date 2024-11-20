@@ -20,8 +20,12 @@ class PopUpSubState extends MusicBeatSubstate
     bg.scrollFactor.set();
     add(bg);
 
-    var text:FlxText = new FlxText(0, 0, FlxG.width, _text, 20);
-    text.setFormat(Paths.font('vcr.ttf'), 20, FlxColor.WHITE, CENTER, OUTLINE, FlxColor.BLACK);
+    var text:FlxText = new FlxText(0, 0, FlxG.width, _text, 28);
+    text.setFormat(Paths.font('vcr.ttf'), 28, FlxColor.WHITE, CENTER, OUTLINE, FlxColor.BLACK);
+    text.applyMarkup(_text, [
+      new FlxTextFormatMarkerPair(new FlxTextFormat(FlxColor.RED), '#'),
+      new FlxTextFormatMarkerPair(new FlxTextFormat(FlxColor.CYAN), '$')
+    ]);
     text.screenCenter();
     text.updateHitbox();
     text.scrollFactor.set();

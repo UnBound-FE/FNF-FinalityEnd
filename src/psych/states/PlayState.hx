@@ -32,7 +32,7 @@ import flixel.addons.display.FlxRuntimeShader;
 import openfl.filters.ShaderFilter;
 #end
 #if VIDEOS_ALLOWED
-import hxcodec.flixel.FlxVideo as VideoHandler;
+import hxcodec.flixel.FlxVideoSprite;
 #end
 import psych.objects.Note.EventNote;
 import psych.objects.*;
@@ -204,6 +204,7 @@ class PlayState extends MusicBeatState
   public var camHUD:FlxCamera;
   public var camGame:FlxCamera;
   public var camOther:FlxCamera;
+  public var camVideo:FlxCamera;
   public var cameraSpeed:Float = 1;
 
   public var songScore:Int = 0;
@@ -300,8 +301,12 @@ class PlayState extends MusicBeatState
     camHUD.bgColor.alpha = 0;
     camOther.bgColor.alpha = 0;
 
+    camVideo = new FlxCamera();
+    camVideo.bgColor.alpha = 0;
+
     FlxG.cameras.add(camHUD, false);
     FlxG.cameras.add(camOther, false);
+    FlxG.cameras.add(camVideo, false);
     grpNoteSplashes = new FlxTypedGroup<NoteSplash>();
 
     persistentUpdate = true;
@@ -832,14 +837,17 @@ class PlayState extends MusicBeatState
       return;
     }
 
-    var video:VideoHandler = new VideoHandler();
-    // Recent versions
+    var video:FlxVideoSprite = new FlxVideoSprite();
+    video.scrollFactor.set();
+    video.cameras = [camVideo];
     video.play(filepath);
-    video.onEndReached.add(function() {
-      video.dispose();
+    video.bitmap.onEndReached.add(() -> {
+      video.bitmap.dispose();
+      remove(video);
       startAndEnd();
       return;
     }, true);
+    add(video);
     #else
     FlxG.log.warn('Platform not supported!');
     startAndEnd();
@@ -3205,6 +3213,7 @@ class PlayState extends MusicBeatState
     if (camGame.filters != null) camGame.filters = [];
     if (camHUD.filters != null) camHUD.filters = [];
     if (camOther.filters != null) camOther.filters = [];
+    if (camVideo.filters != null) camVideo.filters = [];
 
     #if HSCRIPT_ALLOWED
     for (script in hscriptArray)
