@@ -1,5 +1,6 @@
 package finality.ui;
 
+import psych.substates.StickerSubState;
 import openfl.filters.ShaderFilter;
 import lime.app.Application;
 import flixel.FlxState;
@@ -141,8 +142,31 @@ class MainMenuState extends MusicBeatState
   /**
    * Creating many many stuff
    */
+  var stickerSubState:StickerSubState;
+
+  public function new(?stickers:StickerSubState = null)
+  {
+    super();
+
+    if (stickers != null)
+    {
+      stickerSubState = stickers;
+    }
+  }
+
   override function create()
   {
+    Paths.clearUnusedMemory();
+
+    if (stickerSubState != null)
+    {
+      openSubState(stickerSubState);
+      stickerSubState.degenStickers();
+      // FlxG.sound.playMusic(Paths.music('freakyMenu'));
+    }
+    else
+      Paths.clearStoredMemory();
+
     camGame = initPsychCamera();
 
     camStuff = new FlxCamera();
@@ -346,7 +370,7 @@ class MainMenuState extends MusicBeatState
         if (controls.justPressed('debug_1'))
         {
           selected = true;
-          MusicBeatState.switchState(new psych.states.editors.MasterEditorMenu());
+          openSubState(new StickerSubState(null, (sticker) -> new FreeplayState(sticker)));
         }
         #end
       }
@@ -470,7 +494,7 @@ class MainMenuState extends MusicBeatState
               }
             default: // nothing bitch
           }
-          MusicBeatState.switchState(all_shit[curSelected].menu);
+          openSubState(new StickerSubState(null, (sticker) -> new FreeplayState(sticker)));
         });
 
         for (i in 0...buttonGrp.members.length)
@@ -492,7 +516,7 @@ class MainMenuState extends MusicBeatState
         FlxTween.tween(FlxG.camera, {zoom: 0.15}, 3, {ease: FlxEase.quadInOut});
         FlxG.sound.play(Paths.sound('cancelMenu'));
         selected = true;
-        MusicBeatState.switchState(new TitleState());
+        openSubState(new StickerSubState(null, (sticker) -> new FreeplayState(sticker)));
     }
   }
 
