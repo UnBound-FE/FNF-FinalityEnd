@@ -29,6 +29,7 @@ class MainMenuState extends MusicBeatState
   var all_shit:Array<ItemOptions> = [
     {
       tag: 'worlds',
+      sticker: true,
       menu: new StoryMenuState(),
       x: 10,
       y: 10,
@@ -69,6 +70,7 @@ class MainMenuState extends MusicBeatState
     },
     {
       tag: 'options',
+      sticker: true,
       menu: new psych.options.OptionsState(),
       x: 10,
       y: (FlxG.height - 200),
@@ -89,6 +91,7 @@ class MainMenuState extends MusicBeatState
     },
     {
       tag: 'credits',
+      sticker: true,
       menu: new CreditsVideo(),
       x: (FlxG.width - 400),
       y: (FlxG.height - 200),
@@ -505,8 +508,14 @@ class MainMenuState extends MusicBeatState
           {
             switch (all_shit[curSelected].tag)
             {
+              case 'worlds':
+                openSubState(new StickerSubState(null, (sticker:StickerSubState) -> new StoryMenuState(sticker)));
               case 'extras':
                 openSubState(new StickerSubState(null, (sticker:StickerSubState) -> new FreeplayState(sticker)));
+              case 'options':
+                openSubState(new StickerSubState(null, (sticker:StickerSubState) -> new psych.options.OptionsState(sticker)));
+              case 'credits':
+                openSubState(new StickerSubState(null, (sticker:StickerSubState) -> new CreditsVideo(sticker)));
             }
           }
         });
