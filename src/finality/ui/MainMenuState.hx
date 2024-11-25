@@ -475,9 +475,6 @@ class MainMenuState extends MusicBeatState
           FlxG.camera.fade(FlxColor.BLACK, 1);
 
           camStuff.fade(FlxColor.BLACK, 1);
-
-          FlxTween.tween(FlxG.camera, {angle: (FlxG.random.bool(50) ? 360 : -360)}, 3, {ease: FlxEase.cubeIn});
-          FlxTween.tween(FlxG.camera, {zoom: 1.4}, 1.74, {ease: FlxEase.quadOut});
         }
 
         FlxG.camera.scroll.x = FlxMath.lerp(FlxG.camera.scroll.x, buttonGrp.members[curSelected].getScreenPosition().x, lerpVal);
