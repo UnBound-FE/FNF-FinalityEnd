@@ -44,7 +44,7 @@ import psych.scripts.LuaUtils;
 import psych.scripts.HScript;
 #end
 #if HSCRIPT_ALLOWED
-import crowplexus.iris.Iris;
+import tscript.TScript;
 #end
 import finality.ui.StoryMenuState;
 import finality.ui.FreeplayState;
@@ -791,7 +791,7 @@ class PlayState extends MusicBeatState
 
     if (doPush)
     {
-      if (Iris.instances.exists(scriptFile)) doPush = false;
+      if (TScript.global.exists(scriptFile)) doPush = false;
 
       if (doPush) initHScript(scriptFile);
     }
@@ -3376,7 +3376,7 @@ class PlayState extends MusicBeatState
 
     if (FileSystem.exists(scriptToLoad))
     {
-      if (Iris.instances.exists(scriptToLoad)) return false;
+      if (TScript.global.exists(scriptToLoad)) return false;
 
       initHScript(scriptToLoad);
       return true;
@@ -3397,7 +3397,7 @@ class PlayState extends MusicBeatState
     catch (e:Dynamic)
     {
       addTextToDebug('ERROR ON LOADING ($file) - $e', FlxColor.RED);
-      var newScript:HScript = cast(Iris.instances.get(file), HScript);
+      var newScript:HScript = cast(TScript.global.get(file), HScript);
       if (newScript != null) newScript.destroy();
     }
   }

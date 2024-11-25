@@ -33,9 +33,11 @@
       "version": "2.5.0"
     },
     {
-      "name": "hscript-iris",
-      "type": "haxelib",
-      "version": "1.1.0"
+      "name": "tscript",
+      "type": "git",
+      "dir": null,
+      "ref": "53121d899e65689067698dd8d865df26b0226156",
+      "url": "https://github.com/MzkX2/tscript"
     },
     {
       "name": "linc_luajit",

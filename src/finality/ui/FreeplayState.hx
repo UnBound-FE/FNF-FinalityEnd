@@ -15,6 +15,7 @@ import psych.objects.HealthIcon;
 import psych.objects.MusicPlayer;
 import psych.substates.GameplayChangersSubstate;
 import psych.substates.ResetScoreSubState;
+import psych.substates.StickerSubState;
 
 typedef CharData =
 {
@@ -74,8 +75,29 @@ class FreeplayState extends MusicBeatState
   var charJson:CharFile;
   var blackfuck:FlxSprite;
 
+  var stickerSubState:StickerSubState;
+
+  public function new(?stickers:StickerSubState = null)
+  {
+    super();
+
+    if (stickers != null)
+    {
+      stickerSubState = stickers;
+    }
+  }
+
   override function create()
   {
+    if (stickerSubState != null)
+    {
+      openSubState(stickerSubState);
+      stickerSubState.degenStickers();
+      // FlxG.sound.playMusic(Paths.music('freakyMenu'));
+    }
+    else
+      Paths.clearStoredMemory();
+
     FlxG.sound.playMusic(Paths.music('themfreepl'), 0.0);
 
     charJson = tjson.TJSON.parse(Paths.getTextFromFile('data/freeplay.json', false));

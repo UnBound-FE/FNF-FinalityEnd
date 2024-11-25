@@ -26,7 +26,7 @@ class MainMenuState extends MusicBeatState
    */
   final buttonsPath:String = "mainmenu/items/";
 
-  final all_shit:Array<ItemOptions> = [
+  var all_shit:Array<ItemOptions> = [
     {
       tag: 'worlds',
       menu: new StoryMenuState(),
@@ -49,7 +49,7 @@ class MainMenuState extends MusicBeatState
     },
     {
       tag: 'extras',
-      menu: new FreeplayState(),
+      sticker: true,
       x: (FlxG.width - 400),
       y: 10,
       pitch:
@@ -370,7 +370,7 @@ class MainMenuState extends MusicBeatState
         if (controls.justPressed('debug_1'))
         {
           selected = true;
-          openSubState(new StickerSubState(null, (sticker) -> new FreeplayState(sticker)));
+          MusicBeatState.switchState(new psych.states.editors.MasterEditorMenu());
         }
         #end
       }
@@ -445,12 +445,15 @@ class MainMenuState extends MusicBeatState
   {
     FlxG.mouse.visible = false;
 
-    if (staticTween != null) staticTween.cancel();
+    if (all_shit[curSelected].sticker == null || !all_shit[curSelected].sticker)
+    {
+      if (staticTween != null) staticTween.cancel();
 
-    camGrp.members[0].alpha = 0.25;
+      camGrp.members[0].alpha = 0.25;
 
-    staticTween = FlxTween.tween(camGrp.members[0], {alpha: 0.075}, 0.35, {ease: FlxEase.quadIn, onComplete: (t:FlxTween) -> t = null});
-    FlxTween.tween(camGrp.members[0], {alpha: 1}, 1.25, {ease: FlxEase.cubeInOut, startDelay: 0.35, onComplete: (t:FlxTween) -> t = null});
+      staticTween = FlxTween.tween(camGrp.members[0], {alpha: 0.075}, 0.35, {ease: FlxEase.quadIn, onComplete: (t:FlxTween) -> t = null});
+      FlxTween.tween(camGrp.members[0], {alpha: 1}, 1.25, {ease: FlxEase.cubeInOut, startDelay: 0.35, onComplete: (t:FlxTween) -> t = null});
+    }
 
     var lerpVal:Float = boundTo(FlxG.elapsed * 2.4, 0, 1);
     switch (value)
@@ -467,12 +470,15 @@ class MainMenuState extends MusicBeatState
         FlxG.sound.play(Paths.sound('confirmMenu'));
         selected = true;
 
-        FlxG.camera.fade(FlxColor.BLACK, 1);
+        if (all_shit[curSelected].sticker == null || !all_shit[curSelected].sticker)
+        {
+          FlxG.camera.fade(FlxColor.BLACK, 1);
 
-        camStuff.fade(FlxColor.BLACK, 1);
+          camStuff.fade(FlxColor.BLACK, 1);
 
-        FlxTween.tween(FlxG.camera, {angle: (FlxG.random.bool(50) ? 360 : -360)}, 3, {ease: FlxEase.cubeIn});
-        FlxTween.tween(FlxG.camera, {zoom: 1.4}, 1.74, {ease: FlxEase.quadOut});
+          FlxTween.tween(FlxG.camera, {angle: (FlxG.random.bool(50) ? 360 : -360)}, 3, {ease: FlxEase.cubeIn});
+          FlxTween.tween(FlxG.camera, {zoom: 1.4}, 1.74, {ease: FlxEase.quadOut});
+        }
 
         FlxG.camera.scroll.x = FlxMath.lerp(FlxG.camera.scroll.x, buttonGrp.members[curSelected].getScreenPosition().x, lerpVal);
         FlxG.camera.scroll.y = FlxMath.lerp(FlxG.camera.scroll.y, buttonGrp.members[curSelected].getScreenPosition().y, lerpVal);
@@ -494,7 +500,18 @@ class MainMenuState extends MusicBeatState
               }
             default: // nothing bitch
           }
-          openSubState(new StickerSubState(null, (sticker) -> new FreeplayState(sticker)));
+
+          if (all_shit[curSelected].menu != null
+            && (all_shit[curSelected].sticker == null
+              || !all_shit[curSelected].sticker)) MusicBeatState.switchState(all_shit[curSelected].menu);
+          else if (all_shit[curSelected].sticker != null || all_shit[curSelected].sticker)
+          {
+            switch (all_shit[curSelected].tag)
+            {
+              case 'extras':
+                openSubState(new StickerSubState(null, (sticker:StickerSubState) -> new FreeplayState(sticker)));
+            }
+          }
         });
 
         for (i in 0...buttonGrp.members.length)
@@ -516,7 +533,7 @@ class MainMenuState extends MusicBeatState
         FlxTween.tween(FlxG.camera, {zoom: 0.15}, 3, {ease: FlxEase.quadInOut});
         FlxG.sound.play(Paths.sound('cancelMenu'));
         selected = true;
-        openSubState(new StickerSubState(null, (sticker) -> new FreeplayState(sticker)));
+        MusicBeatState.switchState(new TitleState());
     }
   }
 
@@ -553,9 +570,10 @@ class MainMenuState extends MusicBeatState
 typedef ItemOptions =
 {
   var tag:String;
-  var menu:FlxState;
+  var ?menu:Null<FlxState>;
   var x:Float;
   var y:Float;
+  var ?sticker:Bool;
   var pitch:PitchOptions;
 }
 

@@ -291,7 +291,7 @@ class Project extends HXProject
     if (VIDEOS_ALLOWED.isEnabled(this)) this.haxelibs.push(new Haxelib('hxCodec', '3.0.2'));
     if (DISCORD_ALLOWED.isEnabled(this)) this.haxelibs.push(new Haxelib('hxdiscord_rpc', 'git'));
     if (LUA_ALLOWED.isEnabled(this)) this.haxelibs.push(new Haxelib('linc_luajit', 'git'));
-    if (HSCRIPT_ALLOWED.isEnabled(this)) this.haxelibs.push(new Haxelib('hscript-iris', '1.1.0'));
+    if (HSCRIPT_ALLOWED.isEnabled(this)) this.haxelibs.push(new Haxelib('tscript', 'git'));
 
     this.haxelibs.push(new Haxelib('systools', 'git'));
   }
