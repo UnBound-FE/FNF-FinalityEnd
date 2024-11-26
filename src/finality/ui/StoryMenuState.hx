@@ -1,6 +1,7 @@
 package finality.ui;
 
 import psych.backend.Highscore;
+import psych.substates.StickerSubState;
 import psych.backend.Song;
 import psych.backend.WeekData;
 import psych.substates.GameplayChangersSubstate;
@@ -32,9 +33,28 @@ class StoryMenuState extends MusicBeatState
 
   var loadedWeeks:Array<WeekData> = [];
 
+  var stickerSubState:StickerSubState;
+
+  public function new(?stickers:StickerSubState = null)
+  {
+    super();
+
+    if (stickers != null)
+    {
+      stickerSubState = stickers;
+    }
+  }
+
   override function create()
   {
-    Paths.clearStoredMemory();
+    if (stickerSubState != null)
+    {
+      openSubState(stickerSubState);
+      stickerSubState.degenStickers();
+      // FlxG.sound.playMusic(Paths.music('freakyMenu'));
+    }
+    else
+      Paths.clearStoredMemory();
     Paths.clearUnusedMemory();
 
     PlayState.isStoryMode = true;

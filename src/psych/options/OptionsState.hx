@@ -5,6 +5,7 @@ import flixel.util.FlxDestroyUtil;
 import openfl.display.BlendMode;
 import psych.backend.StageData;
 import finality.shaders.VignetteShader;
+import psych.substates.StickerSubState;
 
 class OptionsState extends MusicBeatState
 {
@@ -36,11 +37,28 @@ class OptionsState extends MusicBeatState
   var selectorLeft:Alphabet;
   var selectorRight:Alphabet;
 
+  var stickerSubState:StickerSubState;
+
+  public function new(?stickers:StickerSubState = null)
+  {
+    super();
+
+    if (stickers != null)
+    {
+      stickerSubState = stickers;
+    }
+  }
+
   override function create()
   {
-    #if DISCORD_ALLOWED
-    DiscordClient.instance.changePresence({details: "Options Menu"});
-    #end
+    if (stickerSubState != null)
+    {
+      openSubState(stickerSubState);
+      stickerSubState.degenStickers();
+      // FlxG.sound.playMusic(Paths.music('freakyMenu'));
+    }
+    else
+      #if DISCORD_ALLOWED DiscordClient.instance.changePresence({details: "Options Menu"}); #end
 
     var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('bgnew'));
     bg.antialiasing = ClientPrefs.data.antialiasing;
