@@ -209,15 +209,12 @@ class MainMenuState extends MusicBeatState
     bt1.updateHitbox();
     firstClass.add(bt1);
 
-    var par5:FlxSprite = new FlxSprite();
-    par5.frames = Paths.getSparrowAtlas('par5');
-    par5.animation.addByPrefix('par5', 'par5', 1, false);
-    par5.animation.play('par5');
-    par5.screenCenter();
-    par5.antialiasing = ClientPrefs.data.antialiasing;
-    par5.scrollFactor.set(0.15, 0.15);
-    par5.updateHitbox();
-    firstClass.add(par5);
+    var bt1 = new FlxSprite().loadGraphic(Paths.image('shkaf'));
+    bt1.antialiasing = ClientPrefs.data.antialiasing;
+    bt1.screenCenter();
+    bt1.scrollFactor.set(0.15, 0.15);
+    bt1.updateHitbox();
+    firstClass.add(bt1);
 
     var bt1 = new FlxSprite().loadGraphic(Paths.image('tvscary'));
     bt1.antialiasing = ClientPrefs.data.antialiasing;
@@ -226,7 +223,14 @@ class MainMenuState extends MusicBeatState
     bt1.updateHitbox();
     firstClass.add(bt1);
 
-    var bt1 = new FlxSprite().loadGraphic(Paths.image('aura'));
+    var bt1 = new FlxSprite().loadGraphic(Paths.image('pcnew'));
+    bt1.antialiasing = ClientPrefs.data.antialiasing;
+    bt1.screenCenter();
+    bt1.scrollFactor.set(0.15, 0.15);
+    bt1.updateHitbox();
+    firstClass.add(bt1);
+
+    var bt1 = new FlxSprite().loadGraphic(Paths.image('hz'));
     bt1.antialiasing = ClientPrefs.data.antialiasing;
     bt1.screenCenter();
     bt1.scrollFactor.set(0.15, 0.15);
