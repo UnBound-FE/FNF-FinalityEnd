@@ -89,12 +89,7 @@ class FreeplayState extends MusicBeatState
 
   override function create()
   {
-    if (stickerSubState != null)
-    {
-      openSubState(stickerSubState);
-      stickerSubState.degenStickers();
-      // FlxG.sound.playMusic(Paths.music('freakyMenu'));
-    }
+    if (stickerSubState != null) {}
     else
       Paths.clearStoredMemory();
 
@@ -147,9 +142,7 @@ class FreeplayState extends MusicBeatState
 
     var backdrop4ik1:FlxBackdrop = new FlxBackdrop(FlxGridOverlay.createGrid(80, 80, 160, 160, true, 0xF04B0298, 0x0));
     backdrop4ik1.velocity.set(40, 40);
-    backdrop4ik1.alpha = 0;
     add(backdrop4ik1);
-    FlxTween.tween(backdrop4ik1, {alpha: 1}, 1, {ease: FlxEase.quartInOut, startDelay: 0.5});
 
     var shexe:FlxSprite = new FlxSprite(-10);
     shexe.y = 100;
@@ -158,38 +151,28 @@ class FreeplayState extends MusicBeatState
     shexe.animation.play('shexe');
     shexe.antialiasing = ClientPrefs.data.antialiasing;
     shexe.updateHitbox();
-    shexe.alpha = 0;
     shexe.scrollFactor.set();
     add(shexe);
-    FlxTween.tween(shexe, {alpha: 1}, 1, {ease: FlxEase.quartInOut, startDelay: 0.5});
 
     var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('nothing'));
-    bg.alpha = 0;
     bg.updateHitbox();
     bg.screenCenter();
     add(bg);
-    FlxTween.tween(bg, {alpha: 1}, 1, {ease: FlxEase.quartInOut, startDelay: 0.5});
 
     var bg1:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('BGFR'));
-    bg1.alpha = 0;
     bg1.updateHitbox();
     bg1.screenCenter();
     add(bg1);
-    FlxTween.tween(bg1, {alpha: 1}, 1, {ease: FlxEase.quartInOut, startDelay: 0.5});
 
     char = new FlxSprite(0, 0).makeGraphic(1, 1, 0x0);
-    char.alpha = 0;
     add(char);
-    FlxTween.tween(char, {alpha: 1}, 1, {ease: FlxEase.quartInOut, startDelay: 0.5});
 
     var bt1 = new FlxSprite().loadGraphic(Paths.image('aurada2'));
     bt1.antialiasing = ClientPrefs.data.antialiasing;
     bt1.screenCenter();
-    bt1.alpha = 0;
     bt1.scrollFactor.set(0.15, 0.15);
     bt1.updateHitbox();
     add(bt1);
-    FlxTween.tween(bt1, {alpha: 1}, 1, {ease: FlxEase.quartInOut, startDelay: 0.5});
 
     grpSongs = new FlxTypedGroup<Alphabet>();
     add(grpSongs);
@@ -279,14 +262,20 @@ class FreeplayState extends MusicBeatState
       initPsychCamera().setFilters([new ShaderFilter(s), new ShaderFilter(vcrEffect.shader)]);
     }
 
-    changeSelection();
+    if (stickerSubState != null)
+    {
+      openSubState(stickerSubState);
+      stickerSubState.degenStickers();
+      // FlxG.sound.playMusic(Paths.music('freakyMenu'));
+    }
+
+    changeSelection(0, false);
     updateTexts();
     super.create();
   }
 
   override function closeSubState()
   {
-    changeSelection(0, false);
     persistentUpdate = true;
     super.closeSubState();
   }
