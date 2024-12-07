@@ -140,25 +140,6 @@ class FreeplayState extends MusicBeatState
     }
     Mods.loadTopMod();
 
-    var backdrop4ik1:FlxBackdrop = new FlxBackdrop(FlxGridOverlay.createGrid(80, 80, 160, 160, true, 0xF04B0298, 0x0));
-    backdrop4ik1.velocity.set(40, 40);
-    add(backdrop4ik1);
-
-    var shexe:FlxSprite = new FlxSprite(-10);
-    shexe.y = 100;
-    shexe.frames = Paths.getSparrowAtlas('shexe');
-    shexe.animation.addByPrefix('shexe', 'shexe', 24, true);
-    shexe.animation.play('shexe');
-    shexe.antialiasing = ClientPrefs.data.antialiasing;
-    shexe.updateHitbox();
-    shexe.scrollFactor.set();
-    add(shexe);
-
-    var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('nothing'));
-    bg.updateHitbox();
-    bg.screenCenter();
-    add(bg);
-
     var bg1:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('BGFR'));
     bg1.updateHitbox();
     bg1.screenCenter();
@@ -166,6 +147,32 @@ class FreeplayState extends MusicBeatState
 
     char = new FlxSprite(0, 0).makeGraphic(1, 1, 0x0);
     add(char);
+
+    var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('nothing'));
+    bg.updateHitbox();
+    bg.screenCenter();
+    add(bg);
+
+    var bt1 = new FlxSprite().loadGraphic(Paths.image('sasasa'));
+    bt1.antialiasing = ClientPrefs.data.antialiasing;
+    bt1.screenCenter();
+    bt1.scrollFactor.set(0.15, 0.15);
+    bt1.updateHitbox();
+    add(bt1);
+
+    var bt1 = new FlxSprite().loadGraphic(Paths.image('whaaaa'));
+    bt1.antialiasing = ClientPrefs.data.antialiasing;
+    bt1.screenCenter();
+    bt1.scrollFactor.set(0.15, 0.15);
+    bt1.updateHitbox();
+    add(bt1);
+
+    var bt1 = new FlxSprite().loadGraphic(Paths.image('pvccc'));
+    bt1.antialiasing = ClientPrefs.data.antialiasing;
+    bt1.screenCenter();
+    bt1.scrollFactor.set(0.15, 0.15);
+    bt1.updateHitbox();
+    add(bt1);
 
     var bt1 = new FlxSprite().loadGraphic(Paths.image('aurada2'));
     bt1.antialiasing = ClientPrefs.data.antialiasing;
