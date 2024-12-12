@@ -31,13 +31,13 @@ class MainMenuState extends MusicBeatState
       tag: 'worlds',
       sticker: true,
       menu: new StoryMenuState(),
-      x: 10,
-      y: 10,
+      x: 570,
+      y: 210,
       pitch:
         {
           name: 'worlds',
           scale: 1,
-          addX: 50,
+          addX: 1150,
           addY: -50,
           prefix:
             {
@@ -51,14 +51,14 @@ class MainMenuState extends MusicBeatState
     {
       tag: 'extras',
       sticker: true,
-      x: (FlxG.width - 400),
-      y: 10,
+      x: (FlxG.width - 480),
+      y: 285,
       pitch:
         {
           name: 'extras',
           scale: 1,
           addX: 0,
-          addY: -50,
+          addY: -1150,
           prefix:
             {
               name: 'headlooped2',
@@ -72,14 +72,14 @@ class MainMenuState extends MusicBeatState
       tag: 'options',
       sticker: true,
       menu: new psych.options.OptionsState(),
-      x: 10,
-      y: (FlxG.height - 200),
+      x: 280,
+      y: (FlxG.height - 260),
       pitch:
         {
           name: 'options',
           scale: 1,
           addX: 0,
-          addY: -40,
+          addY: -1140,
           prefix:
             {
               name: 'headlooped4',
@@ -93,14 +93,14 @@ class MainMenuState extends MusicBeatState
       tag: 'credits',
       sticker: true,
       menu: new CreditsVideo(),
-      x: (FlxG.width - 400),
-      y: (FlxG.height - 200),
+      x: (FlxG.width - 745),
+      y: (FlxG.height - 650),
       pitch:
         {
           name: 'credits',
           scale: 1.05,
           addX: 0,
-          addY: -80,
+          addY: -1180,
           prefix:
             {
               name: 'headlooped',
@@ -191,54 +191,33 @@ class MainMenuState extends MusicBeatState
     firstClass = new FlxSpriteGroup();
     add(firstClass);
 
-    var bg = new FlxSprite().loadGraphic(Paths.image('nothing'));
+    var bg = new FlxSprite().loadGraphic(Paths.image('newpc'));
     bg.antialiasing = ClientPrefs.data.antialiasing;
     bg.screenCenter();
     bg.scrollFactor.set(0.15, 0.15);
     bg.updateHitbox();
     firstClass.add(bg);
 
-    var backdrop4ik1:FlxBackdrop = new FlxBackdrop(FlxGridOverlay.createGrid(80, 80, 160, 160, true, 0xF04B0298, 0x0));
-    backdrop4ik1.velocity.set(40, 40);
-    firstClass.add(backdrop4ik1);
-
-    var bt1 = new FlxSprite().loadGraphic(Paths.image('pol'));
-    bt1.antialiasing = ClientPrefs.data.antialiasing;
-    bt1.screenCenter();
-    bt1.scrollFactor.set(0.15, 0.15);
-    bt1.updateHitbox();
-    firstClass.add(bt1);
-
-    var bt1 = new FlxSprite().loadGraphic(Paths.image('shkaf'));
-    bt1.antialiasing = ClientPrefs.data.antialiasing;
-    bt1.screenCenter();
-    bt1.scrollFactor.set(0.15, 0.15);
-    bt1.updateHitbox();
-    firstClass.add(bt1);
-
-    var bt1 = new FlxSprite().loadGraphic(Paths.image('tvscary'));
-    bt1.antialiasing = ClientPrefs.data.antialiasing;
-    bt1.screenCenter();
-    bt1.scrollFactor.set(0.15, 0.15);
-    bt1.updateHitbox();
-    firstClass.add(bt1);
-
-    var bt1 = new FlxSprite().loadGraphic(Paths.image('pcnew'));
-    bt1.antialiasing = ClientPrefs.data.antialiasing;
-    bt1.screenCenter();
-    bt1.scrollFactor.set(0.15, 0.15);
-    bt1.updateHitbox();
-    firstClass.add(bt1);
-
-    var bt1 = new FlxSprite().loadGraphic(Paths.image('hz'));
-    bt1.antialiasing = ClientPrefs.data.antialiasing;
-    bt1.screenCenter();
-    bt1.scrollFactor.set(0.15, 0.15);
-    bt1.updateHitbox();
-    firstClass.add(bt1);
-
     pitchGrp = new FlxSpriteGroup();
     add(pitchGrp);
+
+    var da:FlxSprite = new FlxSprite(1090);
+    da.y = 405;
+    da.frames = Paths.getSparrowAtlas('speaker');
+    da.animation.addByPrefix('speaker', 'speaker', 24, true);
+    da.animation.play('speaker');
+    da.antialiasing = ClientPrefs.data.antialiasing;
+    da.scrollFactor.set(0.15, 0.15);
+    da.updateHitbox();
+    da.scrollFactor.set();
+    firstClass.add(da);
+
+    var bg = new FlxSprite().loadGraphic(Paths.image('blockpc'));
+    bg.antialiasing = ClientPrefs.data.antialiasing;
+    bg.screenCenter();
+    bg.scrollFactor.set(0.15, 0.15);
+    bg.updateHitbox();
+    firstClass.add(bg);
 
     buttonGrp = new FlxSpriteGroup();
     add(buttonGrp);
@@ -320,7 +299,7 @@ class MainMenuState extends MusicBeatState
       FlxG.camera.setFilters([new ShaderFilter(vcrEffect.shader), new ShaderFilter(s)]);
     }
 
-    FlxG.camera.zoom = 0.925;
+    FlxG.camera.zoom = 0.950;
     changeSelection(0, false, true);
   }
 
@@ -337,8 +316,8 @@ class MainMenuState extends MusicBeatState
     var lerpVal:Float = boundTo(e * 2.4, 0, 1);
     if (!selected)
     {
-      FlxG.camera.scroll.x = FlxMath.lerp(FlxG.camera.scroll.x, (FlxG.mouse.screenX - (FlxG.width / 2)) * 0.015, lerpVal);
-      FlxG.camera.scroll.y = FlxMath.lerp(FlxG.camera.scroll.y, (FlxG.mouse.screenY - (FlxG.height / 2) - 6) * 0.015, lerpVal);
+      FlxG.camera.scroll.x = FlxMath.lerp(FlxG.camera.scroll.x, (FlxG.mouse.screenX - (FlxG.width / 2)) * 0.15, lerpVal);
+      FlxG.camera.scroll.y = FlxMath.lerp(FlxG.camera.scroll.y, (FlxG.mouse.screenY - (FlxG.height / 2) - 6) * 0.15, lerpVal);
 
       if (controls.BACK || FlxG.mouse.justPressedRight) select();
       if (controls.ACCEPT) select('custom');
@@ -528,14 +507,13 @@ class MainMenuState extends MusicBeatState
         {
           if (i == curSelected) continue;
 
-          FlxTween.tween(buttonGrp.members[i], {alpha: 0}, 0.4,
-            {
-              ease: FlxEase.quadOut,
-              onComplete: (_:FlxTween) -> {
-                _ = null;
-                buttonGrp.members[i].kill();
-              }
-            });
+          {
+            ease: FlxEase.quadOut,
+            onComplete: (_:FlxTween) -> {
+              _ = null;
+              buttonGrp.members[i].kill();
+            }
+          };
         }
 
       default:
