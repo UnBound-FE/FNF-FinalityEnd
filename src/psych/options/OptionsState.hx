@@ -66,25 +66,6 @@ class OptionsState extends MusicBeatState
     bg.screenCenter();
     add(bg);
 
-    var body:FlxSprite = new FlxSprite(50);
-    body.y = 210;
-    body.frames = Paths.getSparrowAtlas('body');
-    body.animation.addByPrefix('body', 'body', 24, true);
-    body.animation.play('body');
-    body.antialiasing = ClientPrefs.data.antialiasing;
-    body.updateHitbox();
-    body.scrollFactor.set();
-    add(body);
-
-    var par2:FlxSprite = new FlxSprite();
-    par2.frames = Paths.getSparrowAtlas('par2');
-    par2.animation.addByPrefix('par2', 'par2', 1, false);
-    par2.animation.play('par2');
-    par2.antialiasing = ClientPrefs.data.antialiasing;
-    par2.updateHitbox();
-    par2.scrollFactor.set();
-    add(par2);
-
     grpOptions = new FlxTypedGroup<Alphabet>();
     add(grpOptions);
 
