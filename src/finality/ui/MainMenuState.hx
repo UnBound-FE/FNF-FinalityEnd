@@ -31,14 +31,14 @@ class MainMenuState extends MusicBeatState
       tag: 'worlds',
       sticker: true,
       menu: new StoryMenuState(),
-      x: 570,
-      y: 210,
+      x: 540,
+      y: 190,
       pitch:
         {
           name: 'worlds',
           scale: 1,
-          addX: 1150,
-          addY: -50,
+          addX: 1550,
+          addY: -100,
           prefix:
             {
               name: 'headlooped3',
@@ -72,8 +72,8 @@ class MainMenuState extends MusicBeatState
       tag: 'options',
       sticker: true,
       menu: new psych.options.OptionsState(),
-      x: 280,
-      y: (FlxG.height - 260),
+      x: 80,
+      y: (FlxG.height - 440),
       pitch:
         {
           name: 'options',
@@ -93,7 +93,7 @@ class MainMenuState extends MusicBeatState
       tag: 'credits',
       sticker: true,
       menu: new CreditsVideo(),
-      x: (FlxG.width - 745),
+      x: (FlxG.width - 765),
       y: (FlxG.height - 650),
       pitch:
         {
@@ -299,7 +299,7 @@ class MainMenuState extends MusicBeatState
       FlxG.camera.setFilters([new ShaderFilter(vcrEffect.shader), new ShaderFilter(s)]);
     }
 
-    FlxG.camera.zoom = 0.950;
+    FlxG.camera.zoom = 1.15;
     changeSelection(0, false, true);
   }
 
@@ -392,6 +392,8 @@ class MainMenuState extends MusicBeatState
 
     buttonGrp.members[curSelected].animation.play('idle');
     buttonGrp.members[curSelected].alpha = .6;
+    buttonGrp.members[curSelected].scale.set(1, 1);
+    buttonGrp.members[curSelected].centerOffsets;
     buttonGrp.members[curSelected].updateHitbox();
 
     pitchGrp.members[curSelected].visible = false;
@@ -422,8 +424,9 @@ class MainMenuState extends MusicBeatState
         curUpDownSel = 1;
     }
 
-    buttonGrp.members[curSelected].animation.play('select');
     buttonGrp.members[curSelected].alpha = 1;
+    buttonGrp.members[curSelected].scale.set(1.05, 1.05);
+    buttonGrp.members[curSelected].centerOffsets;
     pitchGrp.members[curSelected].visible = true;
   }
 
