@@ -4,7 +4,6 @@ import finality.ui.MainMenuState;
 import flixel.util.FlxDestroyUtil;
 import openfl.display.BlendMode;
 import psych.backend.StageData;
-import finality.shaders.VignetteShader;
 import psych.substates.StickerSubState;
 
 class OptionsState extends MusicBeatState
@@ -85,8 +84,7 @@ class OptionsState extends MusicBeatState
     if (ClientPrefs.data.shaders)
     {
       vcrEffect = new VcrGlitchEffect();
-      var s = new VignetteShader();
-      initPsychCamera().setFilters([new ShaderFilter(s), new ShaderFilter(vcrEffect.shader)]);
+      initPsychCamera().setFilters([new ShaderFilter(vcrEffect.shader)]);
     }
 
     changeSelection();

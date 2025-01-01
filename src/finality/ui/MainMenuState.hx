@@ -10,7 +10,6 @@ import flixel.addons.transition.FlxTransitionableState.defaultTransIn;
 import flixel.addons.transition.FlxTransitionableState.defaultTransOut;
 import flixel.addons.display.FlxBackdrop;
 import flixel.addons.display.FlxGridOverlay;
-import finality.shaders.VignetteShader;
 
 class MainMenuState extends MusicBeatState
 {
@@ -295,8 +294,7 @@ class MainMenuState extends MusicBeatState
     if (ClientPrefs.data.shaders)
     {
       vcrEffect = new VcrGlitchEffect();
-      var s = new VignetteShader();
-      FlxG.camera.setFilters([new ShaderFilter(vcrEffect.shader), new ShaderFilter(s)]);
+      FlxG.camera.setFilters([new ShaderFilter(vcrEffect.shader)]);
     }
 
     FlxG.camera.zoom = 1.15;

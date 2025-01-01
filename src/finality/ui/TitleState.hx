@@ -4,7 +4,6 @@ import openfl.filters.ShaderFilter;
 import haxe.Json;
 import psych.backend.WeekData;
 import psych.backend.Highscore;
-import finality.shaders.VignetteShader;
 import flixel.input.keyboard.FlxKey;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.graphics.frames.FlxAtlasFrames;
@@ -226,8 +225,7 @@ class TitleState extends MusicBeatState
     if (ClientPrefs.data.shaders)
     {
       vcrEffect = new VcrGlitchEffect();
-      var s = new VignetteShader();
-      initPsychCamera().setFilters([new ShaderFilter(s), new ShaderFilter(vcrEffect.shader)]);
+      initPsychCamera().setFilters([new ShaderFilter(vcrEffect.shader)]);
     }
 
     Paths.clearUnusedMemory();

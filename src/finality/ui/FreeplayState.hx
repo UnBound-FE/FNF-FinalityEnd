@@ -7,7 +7,6 @@ import flixel.math.FlxMath;
 import flixel.addons.display.FlxBackdrop;
 import flixel.addons.display.FlxGridOverlay;
 import flixel.tweens.misc.NumTween;
-import finality.shaders.VignetteShader;
 import psych.backend.WeekData;
 import psych.backend.Highscore;
 import psych.backend.Song;
@@ -265,8 +264,7 @@ class FreeplayState extends MusicBeatState
     if (ClientPrefs.data.shaders)
     {
       vcrEffect = new VcrGlitchEffect();
-      var s = new VignetteShader();
-      initPsychCamera().setFilters([new ShaderFilter(s), new ShaderFilter(vcrEffect.shader)]);
+      initPsychCamera().setFilters([new ShaderFilter(vcrEffect.shader)]);
     }
 
     if (stickerSubState != null)
